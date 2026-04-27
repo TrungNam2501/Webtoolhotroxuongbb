@@ -49,8 +49,8 @@ TOOLS = [
         "accent": "emerald",
     },
     {
-        "title": "Kiểm tiêu chuẩn máy",
-        "description": "Sắp có: tiêu chuẩn kỹ thuật theo máy trộn.",
+        "title": "Thông số cài đặt",
+        "description": "Danh sách đơn trong ca + tiêu chuẩn cân pmt_weigh theo RecipeCode.",
         "url": "/kiemtratieuchuantheomay",
         "icon": "ruler",
         "accent": "slate",

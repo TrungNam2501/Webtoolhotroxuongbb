@@ -1,29 +1,32 @@
 {% extends 'base.html' %}
-{% block title %}Tiêu chuẩn theo máy{% endblock %}
-{% block breadcrumb %}Tiêu chuẩn theo máy{% endblock %}
+{% block title %}Thông số cài đặt{% endblock %}
+{% block breadcrumb %}Thông số cài đặt{% endblock %}
 
 {% block content %}
 <div class="page-header">
-    <h1 class="page-title">Kiểm tra tiêu chuẩn theo máy</h1>
+    <h1 class="page-title">Thông số cài đặt</h1>
     <p class="page-subtitle">
-        Danh sách đơn làm trong ngày (cửa sổ 06:30 hôm nay → 06:30 hôm sau) lấy từ
-        <code>Ppt_GroupLot</code> trên máy được chọn. Bấm "Xem tiêu chuẩn" ở một hàng để
-        xem các dòng <code>pmt_weigh</code> tương ứng với <code>RecipeCode</code>.
+        Danh sách đơn từ <code>Ppt_GroupLot</code> trong cửa sổ
+        <strong>{{ window_start }}</strong> → <strong>{{ window_end }}</strong>
+        (06:30 ngày được chọn → 06:30 ngày kế tiếp). Bấm "Xem tiêu chuẩn" ở một hàng
+        để xem các dòng <code>pmt_weigh</code> tương ứng với <code>RecipeCode</code>.
     </p>
 </div>
 
 <div class="card">
     <div class="card-header">
-        <h2 class="card-title">Chọn máy trộn</h2>
+        <h2 class="card-title">Chọn máy & ngày</h2>
         <span class="badge">Tổng: {{ rows|length }}</span>
     </div>
     <div class="card-body">
         <form method="get" id="machine-form" class="search-bar" data-submit-loading>
-            <select name="machine" id="machine-select" class="form-control" style="min-width: 180px;">
+            <select name="machine" id="machine-select" class="form-control" style="min-width: 150px;">
                 {% for name in machines %}
                     <option value="{{ name }}" {% if name == selected_machine %}selected{% endif %}>{{ name }}</option>
                 {% endfor %}
             </select>
+            <input type="date" name="day" id="day-input" class="form-control"
+                   value="{{ selected_day }}" style="min-width: 170px;">
             <button type="submit" class="btn btn-primary">Tải danh sách</button>
         </form>
 
@@ -39,7 +42,7 @@
             <table class="data-table table-stacked">
                 <thead>
                     <tr>
-                        <th>Plan_ID</th>
+                        <th>MesPlanID</th>
                         <th>RecipeCode</th>
                         <th>RecipeName</th>
                         <th>Shift</th>
@@ -54,7 +57,7 @@
                 <tbody>
                     {% for r in rows %}
                         <tr>
-                            <td class="text-mono" data-label="Plan_ID">{{ r.plan_id|default:"—" }}</td>
+                            <td class="text-mono" data-label="MesPlanID">{{ r.mes_plan_id|default:"—" }}</td>
                             <td class="text-mono" data-label="RecipeCode">{{ r.recipe_code|default:"—" }}</td>
                             <td data-label="RecipeName">{{ r.recipe_name|default:"—" }}</td>
                             <td data-label="Shift">{{ r.shift|default:"—" }}{% if r.shift_class %} · {{ r.shift_class }}{% endif %}</td>
@@ -89,8 +92,8 @@
                     <path d="M8 18h8"/>
                 </svg>
             </span>
-            <h3>Chưa có đơn trong ca</h3>
-            <p>Máy {{ selected_machine }} không có đơn nào bắt đầu trong khoảng 06:30 hôm nay đến 06:30 ngày mai.</p>
+            <h3>Chưa có đơn trong cửa sổ đã chọn</h3>
+            <p>Máy {{ selected_machine }} không có đơn nào bắt đầu trong khoảng {{ window_start }} đến {{ window_end }}.</p>
         </div>
     {% endif %}
 </div>
@@ -122,7 +125,9 @@
     const machineSelect = document.getElementById('machine-select');
     const form = document.getElementById('machine-form');
 
+    const dayInput = document.getElementById('day-input');
     machineSelect?.addEventListener('change', () => form.submit());
+    dayInput?.addEventListener('change', () => form.submit());
 
     const sheet = document.getElementById('weighSheet');
     const sheetBody = document.getElementById('weighSheetBody');
