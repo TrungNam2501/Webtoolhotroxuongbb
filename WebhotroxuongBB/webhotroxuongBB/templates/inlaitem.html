@@ -1,0 +1,386 @@
+{% extends 'base.html' %}
+{% block title %}In lại tem{% endblock %}
+
+{% block content %}
+<style>
+    /* Reset và font chữ */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    /* Container chính */
+    .data-container {
+        max-width: 1200px;
+        margin: 30px auto;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    /* Thanh tìm kiếm và tiêu đề */
+    .table-header {
+        padding: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: linear-gradient(135deg, #7ce4cd1e, #4d5152ff);
+        color: white;
+        flex-wrap: wrap;
+    }
+    .table-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: black;
+    }
+    .printer-select {
+        margin: 0 15px;
+    }
+    .printer-select select {
+        padding: 10px 15px;
+        border: none;
+        border-radius: 30px;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        outline: none;
+        font-size: 0.9rem;
+        cursor: pointer;
+    }
+    .printer-select select option {
+        background: #333;
+        color: white;
+    }
+    .search-box {
+        position: relative;
+        width: 300px;
+        display: flex;
+        align-items: center;
+    }
+    .search-box input {
+        flex: 1;
+        padding: 10px 15px 10px 40px;
+        border: none;
+        border-radius: 30px;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        outline: none;
+    }
+    .search-box input::placeholder {
+        color: rgba(255, 255, 255, 0.7);
+    }
+    .search-icon {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: white;
+    }
+    .search-box button {
+        padding: 10px 15px;
+        border: none;
+        border-radius: 30px;
+        background: #0062ff;
+        color: white;
+        cursor: pointer;
+        font-size: 0.9rem;
+        margin-left: 10px;
+        transition: background 0.3s;
+    }
+    .search-box button:hover {
+        background: #0050d1;
+    }
+    /* Bảng dữ liệu */
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .data-table thead th {
+        background-color: #f1f1f1;
+        color: #333;
+        font-weight: 600;
+        padding: 15px;
+        text-align: left;
+        border-bottom: 2px solid #ddd;
+    }
+    .data-table tbody tr {
+        border-bottom: 1px solid #eee;
+        transition: all 0.3s ease;
+    }
+    .data-table tbody tr:hover {
+        background-color: #f9f9f9;
+        transform: translateX(5px);
+    }
+    .data-table tbody td {
+        padding: 15px;
+    }
+    /* Status colors */
+    .status {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+    .status.active {
+        background: #e3f5ef;
+        color: #00b894;
+    }
+    .status.pending {
+        background: #fff4e5;
+        color: #f39c12;
+    }
+    .status.inactive {
+        background: #ffecea;
+        color: #e74c3c;
+    }
+    /* Button styles */
+    .btn-detail {
+        border: none;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.9rem;
+    }
+    .btn-active {
+        background: #e3f5ef;
+        color: #00b894;
+    }
+    .btn-pending {
+        background: #fff4e5;
+        color: #f39c12;
+    }
+    .btn-inactive {
+        background: #ffecea;
+        color: #e74c3c;
+    }
+    /* Pagination */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        padding: 20px;
+        list-style: none;
+    }
+    .pagination li {
+        margin: 0 5px;
+    }
+    .pagination a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        color: #333;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s;
+    }
+    .pagination a:hover,
+    .pagination a.active {
+        background: #0062ff;
+        color: white;
+    }
+    /* Responsive */
+    @media (max-width: 768px) {
+        .table-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .printer-select, .search-box {
+            width: 100%;
+            margin-top: 15px;
+        }
+        .printer-select select {
+            width: 100%;
+            border-radius: 30px;
+        }
+        .search-box input {
+            border-radius: 30px;
+        }
+        .search-box button {
+            border-radius: 30px;
+        }
+        .data-table {
+            display: block;
+            overflow-x: auto;
+        }
+    }
+    /* No results message */
+    .no-results {
+        text-align: center;
+        padding: 20px;
+        color: #e74c3c;
+        font-weight: 500;
+    }
+</style>
+
+<div class="data-container">
+    <div class="table-header">
+        <div class="table-title">In lại tem BB</div>
+        <div class="printer-select">
+            <select name="printer" id="printer-select" form="search-form">
+                <option value="">Chọn máy in</option>
+                <option value="HL-L2360D 8.122">HL-L2360D 8.122</option>
+                <option value="HL-L2360D 9.176">HL-L2360D 9.176</option>
+                <option value="HL-L2360D 9.193">HL-L2360D 9.193</option>
+                <option value="HL-L2360D 4.140">HL-L2360D 4.140</option>
+            </select>
+        </div>
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <form method="get" id="search-form">
+                <input type="text" name="barcode" placeholder="Nhập barcode hoặc pallet..." value="{{ query }}">
+                <button type="submit">Tìm</button>
+            </form>
+        </div>
+    </div>
+
+    {% if results %}
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Mesid</th>
+                <th>Barcode</th>
+                <th>PartNo</th>
+                <th>Weight</th>
+                <th>Prodat</th>
+                <th>Effdat</th>
+                <th>Số thẻ</th>
+                <th>Mã pallet</th>
+                <th>Trạng thái</th>
+                <th>In tem</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in results %}
+            <tr>
+                <td>{{ row.mesid }}</td>
+                <td>{{ row.barcode }}</td>
+                <td>{{ row.partno }}</td>
+                <td>{{ row.weight }}</td>
+                <td>{{ row.prodat }}</td>
+                <td>{{ row.effdat }}</td>
+                <td>{{ row.usrno }}</td>
+                <td>{{ row.pallet_no }}</td>
+                <td>
+                    <span class="status 
+                        {% if row.active == 'Y' %}active
+                        {% elif row.active == 'N' %}pending
+                        {% else %}inactive{% endif %}">
+                        {% if row.active == 'Y' %}
+                            Đã xuất
+                        {% elif row.active == 'N' %}
+                            Chưa xuất
+                        {% else %}
+                            Không được xuất
+                        {% endif %}
+                    </span>
+                </td>
+                <td>
+                    <button class="btn-detail {% if row.active == 'Y' %}btn-active{% elif row.active == 'N' %}btn-pending{% else %}btn-inactive{% endif %}" 
+                            data-barcode="{{ row.barcode }}" 
+                            onclick="showLoading()">
+                        In tem
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% if total_results > 20 %}
+    <ul class="pagination">
+        {% if page_obj.has_previous %}
+            <li><a href="?barcode={{ query }}&printer={{ printer }}&page={{ page_obj.previous_page_number }}">&laquo;</a></li>
+        {% else %}
+            <li><a href="#" class="prev">&laquo;</a></li>
+        {% endif %}
+        {% for num in page_obj.paginator.page_range %}
+            <li><a href="?barcode={{ query }}&printer={{ printer }}&page={{ num }}" {% if page_obj.number == num %}class="active"{% endif %}>{{ num }}</a></li>
+        {% endfor %}
+        {% if page_obj.has_next %}
+            <li><a href="?barcode={{ query }}&printer={{ printer }}&page={{ page_obj.next_page_number }}">&raquo;</a></li>
+        {% else %}
+            <li><a href="#" class="next">&raquo;</a></li>
+        {% endif %}
+    </ul>
+    {% endif %}
+    {% elif query %}
+    <p class="no-results">Không tìm thấy barcode: <b>{{ query }}</b></p>
+    {% endif %}
+</div>
+
+<script>
+    // Client-side search functionality
+    const searchInput = document.querySelector('.search-box input');
+    const tableRows = document.querySelectorAll('.data-table tbody tr');
+    const searchForm = document.querySelector('#search-form');
+
+    // Trigger client-side search on input
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        tableRows.forEach(row => {
+            const rowText = row.textContent.toLowerCase();
+            row.style.display = rowText.includes(searchTerm) ? '' : 'none';
+        });
+    });
+
+    // Allow form submission with Enter key
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            searchForm.submit();
+        }
+    });
+
+    // Trigger form submission on button click
+    const searchButton = document.querySelector('.search-box button');
+    searchButton.addEventListener('click', function() {
+        searchForm.submit();
+    });
+
+    // Pagination click effect
+    const paginationLinks = document.querySelectorAll('.pagination a');
+    paginationLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            if (!this.classList.contains('active') && !this.classList.contains('prev') && !this.classList.contains('next')) {
+                paginationLinks.forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+            }
+        });
+    });
+
+    document.querySelectorAll('.btn-detail').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const barcode = btn.getAttribute('data-barcode');
+            const printer = document.getElementById('printer-select').value;
+            const originalButtonText = btn.textContent; // Lưu nội dung nút gốc
+
+            if (!printer) {
+                alert("Vui lòng chọn máy in!");
+                return;
+            }
+
+            // Hiển thị loading và vô hiệu hóa nút
+            showLoading(true);
+            btn.disabled = true;
+            btn.textContent = 'Đang xử lý...';
+
+            fetch(`/generate_excel/?barcode=${barcode}&printer=${printer}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("Đã gửi lệnh in thành công!");
+                    } else {
+                        alert("Lỗi: " + data.error);
+                    }
+                })
+                .catch(err => alert('Lỗi gửi lệnh in'))
+                .finally(() => {
+                    // Ẩn loading và khôi phục nút
+                    showLoading(false);
+                    btn.disabled = false;
+                    btn.textContent = originalButtonText; // Khôi phục nội dung nút gốc
+                });
+        });
+    });
+</script>
+{% endblock %}

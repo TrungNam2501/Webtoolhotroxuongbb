@@ -1,0 +1,448 @@
+{% extends "base.html" %}
+{% block title %}Tem OEM KV2{% endblock %}
+{% block content %}
+<style>
+    /* Scoped styles chỉ cho trang này - KHÔNG ảnh hưởng base */
+    .tem-oem-container {
+        max-width: 1400px;
+        margin: 40px auto 0;
+        padding: 0 20px;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        min-height: calc(100vh - 200px);
+        border-radius: 24px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .tem-oem-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.3), transparent);
+    }
+    
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        padding: 60px 40px 40px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .form-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        border-radius: 24px;
+        padding: 40px;
+        box-shadow: 
+            0 25px 50px rgba(0, 0, 0, 0.12),
+            0 0 0 1px rgba(255, 255, 255, 0.3);
+        transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .form-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        z-index: 2;
+    }
+    
+    .bb-card::before {
+        background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+    }
+    
+    .chem-card::before {
+        background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 100%);
+    }
+    
+    .form-card:hover {
+        transform: translateY(-12px) scale(1.02);
+        box-shadow: 
+            0 35px 80px rgba(0, 0, 0, 0.18),
+            0 0 0 1px rgba(255, 255, 255, 0.5);
+    }
+    
+    .form-card h3 {
+        margin: 0 0 32px 0;
+        font-size: 26px;
+        font-weight: 800;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        letter-spacing: -0.5px;
+    }
+    
+    .form-group {
+        position: relative;
+        margin-bottom: 36px;
+    }
+    
+    .form-input {
+        width: 100%;
+        padding: 20px 24px;
+        font-size: 16px;
+        border: 2px solid #e2e8f0;
+        border-radius: 16px;
+        background: rgba(248, 250, 252, 0.8);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        outline: none;
+        backdrop-filter: blur(10px);
+        font-weight: 500;
+        color: #334155;
+    }
+    
+    .form-input:focus {
+        border-color: #3b82f6;
+        box-shadow: 
+            0 0 0 4px rgba(59, 130, 246, 0.15),
+            0 8px 25px rgba(59, 130, 246, 0.1);
+        transform: translateY(-3px);
+        background: rgba(255, 255, 255, 0.95);
+    }
+    
+    .form-input::placeholder {
+        color: #94a3b8;
+        font-weight: 500;
+    }
+    
+    .btn-group {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+    
+    .page-btn {
+        flex: 1;
+        min-width: 130px;
+        padding: 16px 28px;
+        font-size: 15px;
+        font-weight: 700;
+        border: none;
+        border-radius: 16px;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    }
+    
+    .page-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+        transition: left 0.6s;
+        z-index: 1;
+    }
+    
+    .page-btn:hover::before {
+        left: 100%;
+    }
+    
+    .btn-one { 
+        background: linear-gradient(135deg, #10b981, #059669); 
+        color: white; 
+    }
+    .btn-all { 
+        background: linear-gradient(135deg, #06b6d4, #0891b2); 
+        color: white; 
+    }
+    .btn-import { 
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8); 
+        color: white; 
+    }
+    .btn-delete { 
+        background: linear-gradient(135deg, #ef4444, #dc2626); 
+        color: white;
+        min-width: 110px;
+        flex: 0 0 auto;
+    }
+    
+    .page-btn:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+    
+    .messages {
+        max-width: 900px;
+        margin: 0 auto 60px;
+        padding: 0 40px;
+    }
+    
+    .messages ul {
+        list-style: none;
+        padding: 0;
+    }
+    
+    .messages li {
+        color: #1e40af;
+        font-weight: 600;
+        margin-bottom: 12px;
+        padding: 16px 24px;
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 51, 234, 0.05) 100%);
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        border-radius: 16px;
+        backdrop-filter: blur(10px);
+        border-left: 5px solid #3b82f6;
+        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.1);
+        animation: slideIn 0.5s ease-out;
+    }
+    
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    /* Responsive */
+    @media (max-width: 1024px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+            gap: 32px;
+            padding: 40px 24px 32px;
+        }
+        
+        .tem-oem-container {
+            margin: 20px auto 0;
+            border-radius: 20px;
+            padding-bottom: 20px;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .tem-oem-container {
+            margin: 10px auto 0;
+            border-radius: 16px;
+        }
+        
+        .form-grid {
+            padding: 30px 20px 24px;
+            gap: 24px;
+        }
+        
+        .form-card {
+            padding: 32px 24px;
+        }
+        
+        .form-input {
+            padding: 18px 20px;
+            font-size: 16px;
+        }
+        
+        .btn-group {
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .page-btn {
+            min-width: 100%;
+            padding: 18px 24px;
+        }
+    }
+    /* Tìm đến class .page-btn và cập nhật/thêm các dòng này */
+.page-btn {
+    flex: 1;
+    min-width: 0; /* QUAN TRỌNG: Cho phép nút co giãn đều trong flexbox */
+    height: 56px; /* Cố định chiều cao để các nút luôn thẳng hàng */
+    display: inline-flex; /* Thay vì block hoặc flex mặc định */
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap; /* Không cho chữ xuống dòng làm nhảy kích thước */
+    padding: 0 15px; /* Giảm padding ngang nếu chữ quá dài */
+}
+
+/* Đảm bảo span bên trong không chiếm thêm khoảng trống lạ */
+.page-btn span {
+    pointer-events: none; /* Để title của nút cha hoạt động mượt hơn */
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Nếu chữ quá dài sẽ hiện dấu ... thay vì làm to nút */
+}
+
+/*tooltip */
+/* Container của tooltip */
+.custom-tooltip {
+    position: relative;
+    display: inline-flex;
+    flex: 1;
+}
+
+/* Nội dung tooltip */
+.custom-tooltip::after {
+    content: attr(data-title);
+    position: absolute;
+    bottom: 125%; /* Hiển thị phía trên nút */
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: rgba(30, 41, 59, 0.95); /* Màu dark slate */
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 8px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.2s ease;
+    font-size: 12px;
+    font-weight: 500;
+    z-index: 100;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    text-transform: none; /* Không bị viết hoa theo nút */
+    letter-spacing: normal;
+}
+
+/* Mũi tên nhỏ phía dưới tooltip */
+.custom-tooltip::before {
+    content: '';
+    position: absolute;
+    bottom: 110%;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    border-width: 6px;
+    border-style: solid;
+    border-color: rgba(30, 41, 59, 0.95) transparent transparent transparent;
+    opacity: 0;
+    transition: all 0.2s ease;
+    z-index: 100;
+}
+
+/* Hiệu ứng khi hover */
+.custom-tooltip:hover::after,
+.custom-tooltip:hover::before {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* Cập nhật lại .page-btn để khớp với wrapper mới */
+.page-btn {
+    width: 100%; /* Chiếm hết container tooltip */
+    height: 56px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    padding: 0 15px;
+    margin: 0; /* Bỏ margin để tránh lệch */
+}
+</style>
+
+<div class="tem-oem-container">
+    <div class="form-grid">
+        <!-- BB Management Card -->
+        <div class="form-card bb-card">
+            <h3>Quản lý BB</h3>
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="bb">
+                <div class="form-group">
+                    <input type="text" 
+                           name="tem_code" 
+                           class="form-input" 
+                           placeholder="Nhập mã barcode BB..."
+                           autocomplete="off"
+                           required>
+                </div>
+                <div class="btn-group">
+                    <div class="custom-tooltip" data-title="Nhập 1 tem OEM vào hệ thống">
+                        <button type="submit" name="action" value="one" class="page-btn btn-one">
+                            <span>Nhập một tem</span>
+                        </button>
+                    </div>
+
+                    <div class="custom-tooltip" data-title="Dựa vào barcode nhập toàn bộ mã mes thành OEM">
+                        <button type="submit" name="action" value="all" class="page-btn btn-all">
+                            <span>Nhập All</span>
+                        </button>
+                    </div>
+
+                    <div class="custom-tooltip" data-title="Xóa all barcode của mesid có barcode">
+                        <button type="submit" name="action" value="delete" class="page-btn btn-delete">
+                            <span>Xóa OEM</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Chemical Management Card -->
+        <div class="form-card chem-card">
+            <h3>Quản lý Hóa Chất</h3>
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="hoa_chat">
+                <div class="form-group">
+                    <input type="text" 
+                           name="tem_code" 
+                           class="form-input" 
+                           placeholder="Nhập mã plan_id hóa chất..."
+                           autocomplete="off"
+                           required>
+                </div>
+              <div class="btn-group">
+                    <div class="custom-tooltip" data-title="Nhập hóa chất thành OEM">
+                        <button type="submit" name="action" value="import" class="page-btn btn-import">
+                            <span>Thêm OEM</span>
+                        </button>
+                    </div>
+
+                    <div class="custom-tooltip" data-title="Nhập hóa chất thành tem thường">
+                        <button type="submit" name="action" value="delete" class="page-btn btn-delete">
+                            <span>Xóa OEM</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if messages %}
+        <div class="messages">
+            <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+    // Auto-hide mobile keyboard khi focus out
+    document.querySelectorAll('.form-input').forEach(input => {
+        input.addEventListener('blur', () => {
+            setTimeout(() => {
+                window.scrollTo(0, 0);
+            }, 100);
+        });
+    });
+    document.querySelectorAll('form').forEach(form => {
+        form.addEventListener('submit', function() {
+            // Gọi hàm showLoading đã định nghĩa ở base.html
+            if (typeof showLoading === 'function') {
+                showLoading(true);
+            }
+        });
+    });
+</script>
+{% endblock %}
