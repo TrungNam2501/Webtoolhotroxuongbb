@@ -18,7 +18,7 @@
             <h2 class="card-title">Quản lý tem BB</h2>
         </div>
         <div class="card-body">
-            <form method="POST" class="section-stack">
+            <form method="POST" class="section-stack" data-submit-loading>
                 {% csrf_token %}
                 <input type="hidden" name="form_type" value="bb">
                 <div class="form-field">
@@ -43,7 +43,7 @@
             <h2 class="card-title">Quản lý hóa chất</h2>
         </div>
         <div class="card-body">
-            <form method="POST" class="section-stack">
+            <form method="POST" class="section-stack" data-submit-loading>
                 {% csrf_token %}
                 <input type="hidden" name="form_type" value="hoa_chat">
                 <div class="form-field">

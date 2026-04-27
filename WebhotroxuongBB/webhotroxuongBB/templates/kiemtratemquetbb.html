@@ -16,7 +16,7 @@
         <h2 class="card-title">Tìm kiếm</h2>
     </div>
     <div class="card-body">
-        <form method="get" id="search-form" class="search-bar">
+        <form method="get" id="search-form" class="search-bar" data-submit-loading>
             <div class="search-input">
                 <input type="text" name="barcode" value="{{ query }}"
                        placeholder="Nhập mã vạch (V…, R…, hoặc số)" autofocus>
@@ -32,10 +32,19 @@
     </div>
 
     {% if machines %}
+        <div class="filter-pills" role="tablist" aria-label="Lọc máy theo trạng thái">
+            <button type="button" class="filter-pill is-active" data-filter="all" role="tab">Tất cả <span class="count" id="cnt-all">{{ machines|length }}</span></button>
+            <button type="button" class="filter-pill" data-filter="ok" role="tab">Có dữ liệu <span class="count" id="cnt-ok">0</span></button>
+            <button type="button" class="filter-pill" data-filter="nodata" role="tab">Không có <span class="count" id="cnt-nodata">0</span></button>
+            <button type="button" class="filter-pill" data-filter="scanned" role="tab">Đã quét <span class="count" id="cnt-scanned">0</span></button>
+            <button type="button" class="filter-pill" data-filter="error" role="tab">Mất kết nối <span class="count" id="cnt-error">0</span></button>
+        </div>
         <div class="card-body machine-grid-wrap">
-            <div class="machine-grid">
+            <div class="machine-grid" id="machineGrid">
                 {% for m in machines %}
                     <div class="machine-card machine-{{ m.data.state|default:'unknown' }}"
+                         data-state-data="{{ m.data.state|default:'unknown' }}"
+                         data-state-scan="{{ m.scan.state|default:'unknown' }}"
                          {% if m.data.error %}title="{{ m.data.error }}"{% endif %}>
                         <div class="machine-card-head">
                             <span class="machine-name">{{ m.name }}</span>
@@ -163,7 +172,7 @@
     <div class="card" style="margin-top: 24px;">
         <div class="table-caption">Kết quả cho Ppt_BarCodeRep (Bảng quét tem)</div>
         <div class="table-scroll">
-            <table class="data-table">
+            <table class="data-table table-stacked">
                 <thead>
                     <tr>
                         <th>Save Time</th><th>Barcode</th><th>Equip ID</th>
@@ -174,13 +183,13 @@
                 <tbody>
                     {% for item in result2 %}
                         <tr>
-                            <td>{{ item.save_time }}</td>
-                            <td class="text-mono">{{ item.barcode }}</td>
-                            <td>{{ item.equip_id }}</td>
-                            <td class="text-mono">{{ item.plan_id }}</td>
-                            <td>{{ item.recipe_code }}</td>
-                            <td>{{ item.recipe_name }}</td>
-                            <td class="text-mono">{{ item.mater_barcode }}</td>
+                            <td data-label="Save Time">{{ item.save_time }}</td>
+                            <td class="text-mono" data-label="Barcode">{{ item.barcode }}</td>
+                            <td data-label="Equip ID">{{ item.equip_id }}</td>
+                            <td class="text-mono" data-label="Plan ID">{{ item.plan_id }}</td>
+                            <td data-label="Recipe Code">{{ item.recipe_code }}</td>
+                            <td data-label="Recipe Name">{{ item.recipe_name }}</td>
+                            <td class="text-mono" data-label="Mater Barcode">{{ item.mater_barcode }}</td>
                         </tr>
                     {% empty %}
                         <tr><td colspan="7" class="empty-state">Không có dữ liệu</td></tr>
@@ -196,4 +205,43 @@
         </div>
     </div>
 {% endif %}
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function () {
+    const grid = document.getElementById('machineGrid');
+    if (!grid) return;
+    const cards = Array.from(grid.querySelectorAll('.machine-card'));
+    const pills = Array.from(document.querySelectorAll('.filter-pill'));
+
+    const count = (fn) => cards.filter(fn).length;
+    const setCount = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = val;
+    };
+    setCount('cnt-ok', count((c) => c.dataset.stateData === 'ok'));
+    setCount('cnt-nodata', count((c) => c.dataset.stateData === 'nodata'));
+    setCount('cnt-scanned', count((c) => c.dataset.stateScan === 'scanned'));
+    setCount('cnt-error', count((c) =>
+        c.dataset.stateData === 'error' || c.dataset.stateScan === 'error'));
+
+    pills.forEach((pill) => {
+        pill.addEventListener('click', () => {
+            pills.forEach((p) => p.classList.remove('is-active'));
+            pill.classList.add('is-active');
+            const f = pill.dataset.filter;
+            cards.forEach((card) => {
+                let show = true;
+                if (f === 'ok') show = card.dataset.stateData === 'ok';
+                else if (f === 'nodata') show = card.dataset.stateData === 'nodata';
+                else if (f === 'scanned') show = card.dataset.stateScan === 'scanned';
+                else if (f === 'error')
+                    show = card.dataset.stateData === 'error' || card.dataset.stateScan === 'error';
+                card.classList.toggle('is-hidden', !show);
+            });
+        });
+    });
+})();
+</script>
 {% endblock %}

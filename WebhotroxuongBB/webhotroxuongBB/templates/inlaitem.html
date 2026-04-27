@@ -34,7 +34,7 @@
 
     {% if results %}
         <div class="table-scroll">
-            <table class="data-table">
+            <table class="data-table table-stacked">
                 <thead>
                     <tr>
                         <th>Mesid</th>
@@ -52,15 +52,15 @@
                 <tbody>
                     {% for row in results %}
                         <tr>
-                            <td class="text-mono">{{ row.mesid }}</td>
-                            <td class="text-mono">{{ row.barcode }}</td>
-                            <td>{{ row.partno }}</td>
-                            <td>{{ row.weight }}</td>
-                            <td>{{ row.prodat }}</td>
-                            <td>{{ row.effdat }}</td>
-                            <td>{{ row.usrno }}</td>
-                            <td>{{ row.pallet_no }}</td>
-                            <td>
+                            <td class="text-mono" data-label="Mesid">{{ row.mesid }}</td>
+                            <td class="text-mono" data-label="Barcode">{{ row.barcode }}</td>
+                            <td data-label="PartNo">{{ row.partno }}</td>
+                            <td data-label="Weight">{{ row.weight }}</td>
+                            <td data-label="Prodat">{{ row.prodat }}</td>
+                            <td data-label="Effdat">{{ row.effdat }}</td>
+                            <td data-label="Số thẻ">{{ row.usrno }}</td>
+                            <td data-label="Mã pallet">{{ row.pallet_no }}</td>
+                            <td data-label="Trạng thái">
                                 {% if row.active == 'Y' %}
                                     <span class="status-pill status-active">Đã xuất</span>
                                 {% elif row.active == 'N' %}
@@ -69,7 +69,7 @@
                                     <span class="status-pill status-inactive">Không được xuất</span>
                                 {% endif %}
                             </td>
-                            <td>
+                            <td data-label="">
                                 <button class="btn btn-sm btn-primary btn-print"
                                         data-barcode="{{ row.barcode }}">
                                     In tem
@@ -136,12 +136,12 @@
                 );
                 const data = await response.json();
                 if (data.success) {
-                    alert('Đã gửi lệnh in thành công!');
+                    toast('success', 'Đã gửi lệnh in', `Barcode ${barcode} → ${printer}`);
                 } else {
-                    alert(`Lỗi: ${data.error}`);
+                    toast('error', 'Không in được', data.error || 'Lỗi không xác định');
                 }
             } catch (err) {
-                alert('Lỗi gửi lệnh in');
+                toast('error', 'Không gửi được lệnh in', err.message || 'Lỗi mạng');
             } finally {
                 showLoading(false);
                 btn.disabled = false;
