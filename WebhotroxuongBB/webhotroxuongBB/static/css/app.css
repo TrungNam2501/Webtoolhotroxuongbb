@@ -1659,3 +1659,93 @@ button {
         font-size: 1.3rem;
     }
 }
+
+/* ---- Sheet / modal (Tiêu chuẩn máy) ---- */
+
+.sheet {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.sheet[hidden] {
+    display: none;
+}
+
+.sheet-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(2px);
+    cursor: pointer;
+}
+
+.sheet-panel {
+    position: relative;
+    width: min(980px, 100%);
+    max-height: min(88vh, 820px);
+    background: var(--surface);
+    border-top-left-radius: var(--radius-lg);
+    border-top-right-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--surface-border);
+    border-bottom: none;
+    display: flex;
+    flex-direction: column;
+    animation: sheet-rise 220ms cubic-bezier(0.4, 0, 0.2, 1);
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+@keyframes sheet-rise {
+    from { transform: translateY(24px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sheet-panel { animation: none; }
+}
+
+.sheet-head {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--surface-border);
+}
+
+.sheet-head h3 {
+    margin: 0 0 4px;
+    font-size: 1.05rem;
+    font-weight: 600;
+}
+
+.sheet-subtitle {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--text-soft);
+}
+
+.sheet-body {
+    padding: 16px 20px;
+    overflow: auto;
+    flex: 1;
+}
+
+body.sheet-open {
+    overflow: hidden;
+}
+
+/* Mobile: sheet full-screen dính đáy, bo góc 0 */
+@media (min-width: 640px) {
+    .sheet {
+        align-items: center;
+        padding: 24px;
+    }
+    .sheet-panel {
+        border-radius: var(--radius-lg);
+        border-bottom: 1px solid var(--surface-border);
+    }
+}

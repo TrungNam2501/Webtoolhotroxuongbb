@@ -71,7 +71,3 @@ def home(request: HttpRequest) -> HttpResponse:
 
 def about(request: HttpRequest) -> HttpResponse:
     return render(request, "about.html")
-
-
-def kiemtratieuchuantheomay(request: HttpRequest) -> HttpResponse:
-    return render(request, "kiemtratieuchuantheomay.html")

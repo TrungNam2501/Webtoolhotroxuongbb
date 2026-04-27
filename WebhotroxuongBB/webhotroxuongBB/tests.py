@@ -15,7 +15,7 @@ from django.test import Client, TestCase
 class PublicPagesTests(TestCase):
     """Các trang tĩnh không đụng tới database ngoài."""
 
-    databases = {"default"}
+    databases = {"default", "BB1"}
 
     @classmethod
     def setUpClass(cls) -> None:

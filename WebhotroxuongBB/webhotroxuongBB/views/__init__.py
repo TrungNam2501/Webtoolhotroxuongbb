@@ -4,7 +4,7 @@ Re-export các view function để giữ nguyên đường dẫn import cũ
 (``from webhotroxuongBB import views``).
 """
 
-from .home import about, home, kiemtratieuchuantheomay
+from .home import about, home
 from .inlaitem import generate_excel, inlaitem
 from .kiemtra import (
     insert_databaetembb,
@@ -12,12 +12,14 @@ from .kiemtra import (
     kiemtratemquetbb,
 )
 from .tem_oem import temoembb
+from .tieu_chuan import kiemtratieuchuantheomay, kiemtratieuchuantheomay_weigh
 from .transfer import kv1tokv2, tembbcusangkd
 
 __all__ = [
     "home",
     "about",
     "kiemtratieuchuantheomay",
+    "kiemtratieuchuantheomay_weigh",
     "inlaitem",
     "generate_excel",
     "kiemtratemquetbb",
