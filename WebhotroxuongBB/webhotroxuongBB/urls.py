@@ -17,5 +17,10 @@ urlpatterns = [
         views.kiemtratieuchuantheomay,
         name="kiemtratieuchuantheomay",
     ),
+    path(
+        "kiemtratieuchuantheomay/weigh",
+        views.kiemtratieuchuantheomay_weigh,
+        name="kiemtratieuchuantheomay_weigh",
+    ),
     path("temoembb/", views.temoembb, name="temoembb"),
 ]
