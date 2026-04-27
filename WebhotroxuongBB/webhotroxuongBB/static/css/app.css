@@ -543,7 +543,7 @@ button {
     background: var(--surface-muted);
     border: 1px solid var(--surface-border);
     border-radius: var(--radius-full);
-    padding: 12px 16px 12px 44px;
+    padding: 12px 16px 12px 40px;
     font-size: 16px;
     min-height: 44px;
     color: var(--text);
@@ -557,14 +557,22 @@ button {
 }
 
 .search-bar .search-input::before {
-    content: "🔍";
+    /* SVG kính lúp nhúng thẳng để không phụ thuộc font emoji của OS */
+    content: "";
     position: absolute;
     left: 14px;
     top: 50%;
+    width: 16px;
+    height: 16px;
     transform: translateY(-50%);
-    font-size: 0.95rem;
-    color: var(--text-soft);
+    background-color: var(--text-soft);
+    -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='7'/><line x1='21' y1='21' x2='16.65' y2='16.65'/></svg>") no-repeat center / contain;
+    mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='7'/><line x1='21' y1='21' x2='16.65' y2='16.65'/></svg>") no-repeat center / contain;
     pointer-events: none;
+}
+
+.search-bar .search-input:focus-within::before {
+    background-color: var(--primary);
 }
 
 .search-bar select.form-control {
