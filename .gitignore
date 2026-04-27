@@ -1,0 +1,40 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual envs
+.venv/
+venv/
+env/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Django
+db.sqlite3
+db.sqlite3-journal
+*.log
+local_settings.py
+staticfiles/
+media/
+
+# Editor / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Build / packaging
+*.egg-info/
+build/
+dist/
+
+# App-specific
+WebhotroxuongBB/webhotroxuongBB/temp/
+*.xlsx
+!WebhotroxuongBB/webhotroxuongBB/static/logo/*.jpg
+!WebhotroxuongBB/webhotroxuongBB/static/logo/*.png
