@@ -18,13 +18,19 @@
         <h2 class="card-title">Mã vạch material</h2>
     </div>
     <div class="card-body">
-        <form method="get" id="search-form" class="search-bar">
+        <form method="get" id="search-form" class="search-bar" data-submit-loading>
             <div class="search-input">
                 <input type="text" name="barcode" value="{{ barcode }}"
                        placeholder="Nhập mã vạch material (vd: 4205...)" autofocus>
             </div>
-            <button type="submit" class="btn btn-primary">Chuyển dữ liệu</button>
+            <button type="submit" class="btn btn-primary">
+                <span class="btn-spinner" aria-hidden="true"></span>
+                <span>Chuyển dữ liệu</span>
+            </button>
         </form>
+        <p class="page-subtitle" style="margin-top: 12px; font-size: 0.85rem;">
+            Sau khi bấm, hệ thống sẽ chạy truy vấn liên máy — có thể mất vài giây.
+        </p>
     </div>
 </div>
 {% endblock %}

@@ -16,7 +16,7 @@
         <h2 class="card-title">Tìm kiếm</h2>
     </div>
     <div class="card-body">
-        <form method="get" id="search-form" class="search-bar">
+        <form method="get" id="search-form" class="search-bar" data-submit-loading>
             <div class="search-input">
                 <input type="text" name="barcode" value="{{ query }}"
                        placeholder="Nhập slipno…" autofocus>
@@ -27,7 +27,7 @@
 
     {% if result %}
         <div class="table-scroll">
-            <table class="data-table">
+            <table class="data-table table-stacked">
                 <thead>
                     <tr>
                         <th>subno</th><th>slipno</th><th>stacode</th>
@@ -37,14 +37,14 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td>{{ result.subno }}</td>
-                        <td class="text-mono">{{ result.slipno }}</td>
-                        <td>{{ result.stacode }}</td>
-                        <td>{{ result.reason }}</td>
-                        <td>{{ result.indat }}</td>
-                        <td>{{ result.intime }}</td>
-                        <td>{{ result.usrno }}</td>
-                        <td>
+                        <td data-label="subno">{{ result.subno }}</td>
+                        <td class="text-mono" data-label="slipno">{{ result.slipno }}</td>
+                        <td data-label="stacode">{{ result.stacode }}</td>
+                        <td data-label="reason">{{ result.reason }}</td>
+                        <td data-label="indat">{{ result.indat }}</td>
+                        <td data-label="intime">{{ result.intime }}</td>
+                        <td data-label="usrno">{{ result.usrno }}</td>
+                        <td data-label="Trạng thái">
                             {% if result.slipno|length > 11 %}
                                 <span class="status-pill status-pending">leduy mở</span>
                             {% elif result.reason == 'Checked' %}
@@ -53,7 +53,7 @@
                                 <span class="status-pill status-inactive">Khu khác mở</span>
                             {% endif %}
                         </td>
-                        <td>
+                        <td data-label="">
                             {% if result.slipno|length > 11 %}
                                 <span class="empty-state" style="padding: 0;">Không thể chuyển lại</span>
                             {% else %}
@@ -100,9 +100,11 @@
         };
         const missing = Object.entries(data).filter(([_, v]) => !v).map(([k]) => k);
         if (missing.length) {
-            alert('Thiếu dữ liệu: ' + missing.join(', '));
+            toast('error', 'Thiếu dữ liệu', missing.join(', '));
             return;
         }
+
+        if (!confirm('Xác nhận chuyển lại slipno ' + data.slipno + '?')) return;
 
         const original = btn.textContent;
         btn.disabled = true;
@@ -119,10 +121,14 @@
                 body: JSON.stringify(data),
             });
             const json = await res.json();
-            alert(json.message || 'Đã xử lý');
-            if (res.ok) window.location.reload();
+            if (res.ok) {
+                toast('success', 'Đã chuyển lại', json.message || 'Thành công');
+                setTimeout(() => window.location.reload(), 900);
+            } else {
+                toast('error', 'Không chuyển được', json.message || 'Server trả về lỗi');
+            }
         } catch (err) {
-            alert('Có lỗi xảy ra: ' + err.message);
+            toast('error', 'Có lỗi xảy ra', err.message);
         } finally {
             showLoading(false);
             btn.disabled = false;

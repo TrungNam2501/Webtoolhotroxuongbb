@@ -16,12 +16,15 @@
         <h2 class="card-title">Điều kiện WHERE</h2>
     </div>
     <div class="card-body">
-        <form method="get" id="search-form" class="search-bar">
+        <form method="get" id="search-form" class="search-bar" data-submit-loading>
             <div class="search-input">
                 <input type="text" name="where" value="{{ where }}"
                        placeholder="Ví dụ: barcode like '12345%'" autofocus>
             </div>
-            <button type="submit" class="btn btn-primary">Chuyển dữ liệu</button>
+            <button type="submit" class="btn btn-primary">
+                <span class="btn-spinner" aria-hidden="true"></span>
+                <span>Chuyển dữ liệu</span>
+            </button>
         </form>
         <p class="page-subtitle" style="margin-top: 12px;">
             ⚠️ Điều kiện WHERE sẽ được đưa trực tiếp vào câu SQL — chỉ sử

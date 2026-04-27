@@ -3,7 +3,8 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#4f46e5">
     <meta name="color-scheme" content="light dark">
     <title>{% block title %}Webtool hỗ trợ xưởng BB{% endblock %}</title>
 
@@ -126,6 +127,8 @@
         <p>Đang xử lý, vui lòng chờ…</p>
     </div>
 
+    <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
     <script>
         (function () {
             const sidebar = document.getElementById("sidebar");
@@ -143,6 +146,16 @@
                 backdrop.classList.toggle("is-visible");
             });
             backdrop?.addEventListener("click", closeSidebar);
+
+            // Đóng sidebar khi đổi trang hoặc nhấn Esc ở mobile
+            sidebar?.querySelectorAll(".nav-link").forEach((link) => {
+                link.addEventListener("click", () => {
+                    if (window.matchMedia("(max-width: 960px)").matches) closeSidebar();
+                });
+            });
+            document.addEventListener("keydown", (e) => {
+                if (e.key === "Escape") closeSidebar();
+            });
 
             const THEME_KEY = "wbb-theme";
             const stored = localStorage.getItem(THEME_KEY);
@@ -162,6 +175,51 @@
                 overlay.classList.toggle("is-visible", !!show);
                 overlay.setAttribute("aria-hidden", !show);
             };
+
+            // Toast helper: window.toast('success', 'Tiêu đề', 'Mô tả')
+            const container = document.getElementById("toastContainer");
+            window.toast = function (kind, title, body, timeout = 4200) {
+                if (!container) return;
+                const el = document.createElement("div");
+                el.className = "toast is-" + (kind || "info");
+                el.setAttribute("role", kind === "error" ? "alert" : "status");
+                const safe = (s) => String(s == null ? "" : s);
+                el.innerHTML =
+                    '<div>' +
+                    (title ? '<p class="toast-title"></p>' : '') +
+                    (body ? '<p class="toast-body"></p>' : '') +
+                    '</div>';
+                if (title) el.querySelector(".toast-title").textContent = safe(title);
+                if (body) el.querySelector(".toast-body").textContent = safe(body);
+                container.appendChild(el);
+                requestAnimationFrame(() => el.classList.add("is-visible"));
+                setTimeout(() => {
+                    el.classList.remove("is-visible");
+                    setTimeout(() => el.remove(), 220);
+                }, timeout);
+            };
+
+            // Lấy CSRF token của Django từ cookie (dùng cho fetch)
+            window.getCsrfToken = function () {
+                const m = document.cookie.match(/(^| )csrftoken=([^;]+)/);
+                return m ? decodeURIComponent(m[2]) : "";
+            };
+
+            // Đánh dấu button "is-loading" khi submit form
+            document.querySelectorAll("form[data-submit-loading]").forEach((form) => {
+                form.addEventListener("submit", () => {
+                    const btn = form.querySelector("button[type=submit]");
+                    if (btn && !btn.disabled) {
+                        btn.classList.add("is-loading");
+                        btn.disabled = true;
+                        if (!btn.querySelector(".btn-spinner")) {
+                            const sp = document.createElement("span");
+                            sp.className = "btn-spinner";
+                            btn.prepend(sp);
+                        }
+                    }
+                });
+            });
         })();
     </script>
 
