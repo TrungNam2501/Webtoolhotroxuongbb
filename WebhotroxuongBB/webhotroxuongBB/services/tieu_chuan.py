@@ -8,7 +8,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
-from datetime import datetime
+from datetime import date, datetime, timedelta
 from typing import Any
 
 from django.db import DatabaseError, OperationalError, connections
@@ -48,22 +48,23 @@ class PmtWeighRow:
 
 
 GROUP_LOT_SQL = """
-DECLARE @StartBoundary DATETIME;
-DECLARE @EndBoundary DATETIME;
-
-SET @StartBoundary = DATEADD(MINUTE, 390, CAST(CAST(GETDATE() AS DATE) AS DATETIME));
-SET @EndBoundary = DATEADD(DAY, 1, @StartBoundary);
-
 SELECT
     [Id], [Shift], [Shift_Class], [RecipeCode], [RecipeName], [SetNumber],
     [Start_datetime], [End_datetime], [FinishTag], [FinishNum],
     [Plan_ID], [UserPlanID], [MesPlanID]
 FROM [mfns].[dbo].[Ppt_GroupLot]
-WHERE [Start_datetime] >= @StartBoundary
-  AND [Start_datetime] < @EndBoundary
+WHERE [Start_datetime] >= %s
+  AND [Start_datetime] < %s
 ORDER BY [Start_datetime] DESC;
 """
 
+
+
+def day_boundaries(day: date) -> tuple[datetime, datetime]:
+    """Trả về (06:30 của ``day``, 06:30 của ``day + 1``)."""
+    start = datetime.combine(day, datetime.min.time()).replace(hour=6, minute=30)
+    return start, start + timedelta(days=1)
+ 
 
 PMT_WEIGH_SQL = """
 SELECT TOP (1000)
@@ -90,11 +91,17 @@ def _rows(cursor, factory):
     return rows
 
 
-def fetch_group_lot(machine: str) -> list[GroupLotRow]:
-    """Danh sách đơn làm trong ngày trên 1 máy BB."""
+def fetch_group_lot(machine: str, day: date | None = None) -> list[GroupLotRow]:
+    """Danh sách đơn làm trên 1 máy BB, cửa sổ 06:30 ``day`` → 06:30 hôm sau.
+ 
+    ``day`` mặc định là hôm nay nếu không truyền.
+    """
+    if day is None:
+        day = date.today()
+    start, end = day_boundaries(day)
     try:
         with connections[machine].cursor() as cur:
-            cur.execute(GROUP_LOT_SQL)
+            cur.execute(GROUP_LOT_SQL, [start, end])
             cols = [c[0].lower() for c in cur.description]
             mapping = {
                 "id": "id",

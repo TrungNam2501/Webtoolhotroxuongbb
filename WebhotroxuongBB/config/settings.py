@@ -171,16 +171,21 @@ _bb_hosts = {
 }
 
 if USE_SQLITE_FALLBACK:
-    _sqlite = {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": str(BASE_DIR / "db.sqlite3"),
-    }
-    DATABASES = {"default": _sqlite, "33BB": _sqlite}
+    def _sqlite_cfg(alias: str) -> dict:
+        # Mỗi alias 1 file test riêng để Django test runner không
+        # cố gắng xoá trùng cùng một file (gây FileNotFoundError khi teardown).
+        return {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": str(BASE_DIR / "db.sqlite3"),
+            "TEST": {"NAME": str(BASE_DIR / f"test_{alias}.sqlite3")},
+        }
+ 
+    DATABASES = {"default": _sqlite_cfg("default"), "33BB": _sqlite_cfg("33BB")}
     for key in _default_bb_hosts:
-        DATABASES[key] = _sqlite
-        DATABASES[f"{key}_mfnsshare"] = _sqlite
-    DATABASES["KV2KD"] = _sqlite
-    DATABASES["KV1KD"] = _sqlite
+        DATABASES[key] = _sqlite_cfg(key)
+        DATABASES[f"{key}_mfnsshare"] = _sqlite_cfg(f"{key}_mfnsshare")
+    DATABASES["KV2KD"] = _sqlite_cfg("KV2KD")
+    DATABASES["KV1KD"] = _sqlite_cfg("KV1KD")
 else:
     DATABASES = {
         "default": _mssql(_erp_host, _erp_db, timeout=None),

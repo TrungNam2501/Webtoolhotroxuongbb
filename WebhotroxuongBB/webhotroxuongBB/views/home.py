@@ -14,20 +14,6 @@ TOOLS = [
         "accent": "primary",
     },
     {
-        "title": "KV1 → KV2",
-        "description": "Đồng bộ material_resource / batch / work_order qua KV2.",
-        "url": "/kv1tokv2",
-        "icon": "sync",
-        "accent": "teal",
-    },
-    {
-        "title": "Tem BB cũ → KD",
-        "description": "Chuyển dữ liệu prdebe sang kvmes.material_resource.",
-        "url": "/tembbcusangkd",
-        "icon": "shuffle",
-        "accent": "violet",
-    },
-    {
         "title": "Kiểm tem scan BB",
         "description": "Quét các máy BB1..BB8 theo barcode.",
         "url": "/kiemtratemquetbb",
@@ -49,11 +35,25 @@ TOOLS = [
         "accent": "emerald",
     },
     {
-        "title": "Kiểm tiêu chuẩn máy",
-        "description": "Sắp có: tiêu chuẩn kỹ thuật theo máy trộn.",
+        "title": "Tiêu chuẩn cài đặt",
+        "description": "Danh sách đơn trong ca + tiêu chuẩn cân pmt_weigh theo RecipeCode.",
         "url": "/kiemtratieuchuantheomay",
         "icon": "ruler",
         "accent": "slate",
+    },
+     {
+        "title": "KV1 → KV2",
+        "description": "Đồng bộ material_resource / batch / work_order qua KV2.",
+        "url": "/kv1tokv2",
+        "icon": "sync",
+        "accent": "teal",
+    },
+    {
+        "title": "Tem BB cũ → KD",
+        "description": "Chuyển dữ liệu prdebe sang kvmes.material_resource.",
+        "url": "/tembbcusangkd",
+        "icon": "shuffle",
+        "accent": "violet",
     },
     {
         "title": "Giới thiệu",
