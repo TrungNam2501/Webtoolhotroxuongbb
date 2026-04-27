@@ -35,6 +35,7 @@ def _dispatch(request: HttpRequest, mapping: dict, action: str, tem_code: str) -
 
 def temoembb(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
+        print(f"DEBUG POST DATA: {request.POST}")
         form_type = request.POST.get("form_type")
         tem_code = request.POST.get("tem_code", "").strip()
         action = request.POST.get("action", "")

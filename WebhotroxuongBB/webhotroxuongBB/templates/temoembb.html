@@ -18,20 +18,22 @@
             <h2 class="card-title">Quản lý tem BB</h2>
         </div>
         <div class="card-body">
-            <form method="POST" class="section-stack" data-submit-loading>
+            <form method="POST" class="section-stack" id="form-bb">
                 {% csrf_token %}
                 <input type="hidden" name="form_type" value="bb">
+                <input type="hidden" name="action" id="action-bb">
+
                 <div class="form-field">
                     <label class="form-label" for="bb-input">Barcode BB</label>
                     <input id="bb-input" type="text" name="tem_code" class="form-control"
                            placeholder="Nhập mã barcode BB…" autocomplete="off" required>
                 </div>
                 <div class="btn-row">
-                    <button type="submit" name="action" value="one" class="btn btn-success"
+                    <button type="button" onclick="submitCustom('form-bb', 'action-bb', 'one')" class="btn btn-success"
                             title="Nhập 1 tem OEM vào hệ thống">Nhập 1 tem</button>
-                    <button type="submit" name="action" value="all" class="btn btn-info"
+                    <button type="button" onclick="submitCustom('form-bb', 'action-bb', 'all')" class="btn btn-info"
                             title="Dựa vào barcode nhập toàn bộ mã mes thành OEM">Nhập nhóm</button>
-                    <button type="submit" name="action" value="delete" class="btn btn-danger"
+                    <button type="button" onclick="submitCustom('form-bb', 'action-bb', 'delete')" class="btn btn-danger"
                             title="Xóa toàn bộ barcode cùng mesid">Xóa OEM</button>
                 </div>
             </form>
@@ -43,18 +45,20 @@
             <h2 class="card-title">Quản lý hóa chất</h2>
         </div>
         <div class="card-body">
-            <form method="POST" class="section-stack" data-submit-loading>
+            <form method="POST" class="section-stack" id="form-chem">
                 {% csrf_token %}
                 <input type="hidden" name="form_type" value="hoa_chat">
+                <input type="hidden" name="action" id="action-chem">
+
                 <div class="form-field">
                     <label class="form-label" for="chem-input">Plan ID</label>
                     <input id="chem-input" type="text" name="tem_code" class="form-control"
                            placeholder="Nhập mã plan_id hóa chất…" autocomplete="off" required>
                 </div>
                 <div class="btn-row">
-                    <button type="submit" name="action" value="import" class="btn btn-info"
+                    <button type="button" onclick="submitCustom('form-chem', 'action-chem', 'import')" class="btn btn-info"
                             title="Chuyển hóa chất thành OEM">Thêm OEM</button>
-                    <button type="submit" name="action" value="delete" class="btn btn-danger"
+                    <button type="button" onclick="submitCustom('form-chem', 'action-chem', 'delete')" class="btn btn-danger"
                             title="Hoàn tác về tem thường (KD)">Xóa OEM</button>
                 </div>
             </form>
@@ -65,10 +69,31 @@
 
 {% block extra_scripts %}
 <script>
-(function () {
-    document.querySelectorAll('form').forEach((form) => {
-        form.addEventListener('submit', () => showLoading(true));
-    });
-})();
+/**
+ * Hàm hỗ trợ gán action và submit form
+ * @param {string} formId - ID của thẻ form
+ * @param {string} hiddenInputId - ID của ô input hidden giữ action
+ * @param {string} actionValue - Giá trị (one, all, delete, import...)
+ */
+function submitCustom(formId, hiddenInputId, actionValue) {
+    const form = document.getElementById(formId);
+    const hiddenInput = document.getElementById(hiddenInputId);
+    
+    // Kiểm tra tính hợp lệ của form (required fields)
+    if (!form.reportValidity()) {
+        return;
+    }
+
+    // Gán giá trị action vào input ẩn
+    hiddenInput.value = actionValue;
+
+    // Hiển thị loading nếu có hàm showLoading
+    if (typeof showLoading === 'function') {
+        showLoading(true);
+    }
+
+    // Thực hiện submit
+    form.submit();
+}
 </script>
 {% endblock %}
