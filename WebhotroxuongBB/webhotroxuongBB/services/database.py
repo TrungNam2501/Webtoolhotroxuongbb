@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Iterable
 
 from django.db import DatabaseError, OperationalError
@@ -18,18 +19,44 @@ PRINTERS: list[str] = [
 ]
 
 
+@dataclass
+class ServerStatus:
+    """Kết quả query của 1 BB server — dùng để render card status."""
+
+    server: str
+    state: str  # "ok" | "nodata" | "error" | "scanned" | "not_scanned"
+    message: str
+    count: int = 0
+    error: str = ""
+
+    @property
+    def short_label(self) -> str:
+        if self.state == "ok":
+            return "Có dữ liệu"
+        if self.state == "nodata":
+            return "Không có"
+        if self.state == "scanned":
+            return f"Đã quét {self.count} lần"
+        if self.state == "not_scanned":
+            return "Chưa quét"
+        return "Lỗi kết nối"
+
+
 def query_across_servers(
     servers: Iterable[str],
     model: type[Model],
     filter_field: str,
     query_value: str,
-) -> tuple[list[Model] | Model | None, list[str]]:
+) -> tuple[list[Model] | Model | None, list[ServerStatus]]:
     """Truy vấn ``model`` trên nhiều database BB.
 
     - Nếu ``filter_field == 'mater_barcode'``: gom toàn bộ bản ghi khớp.
     - Ngược lại: chỉ trả về bản ghi đầu tiên tìm thấy.
+
+    Trả về ``(result, statuses)``: mỗi ``ServerStatus`` mô tả trạng thái
+    của 1 server (dùng để render card ở UI).
     """
-    messages: list[str] = []
+    statuses: list[ServerStatus] = []
 
     if filter_field == "mater_barcode":
         result: list[Model] = []
@@ -39,14 +66,32 @@ def query_across_servers(
                 count = queryset.count()
                 if count:
                     result.extend(list(queryset))
-                    messages.append(f"Máy {server} đã quét {count} lần")
+                    statuses.append(
+                        ServerStatus(
+                            server=server,
+                            state="scanned",
+                            message=f"Máy {server} đã quét {count} lần",
+                            count=count,
+                        )
+                    )
                 else:
-                    messages.append(f"Máy {server} chưa quét")
+                    statuses.append(
+                        ServerStatus(
+                            server=server,
+                            state="not_scanned",
+                            message=f"Máy {server} chưa quét",
+                        )
+                    )
             except (OperationalError, DatabaseError) as exc:
-                messages.append(f"Máy {server} tắt (lỗi kết nối: {exc})")
-        if not result:
-            messages.append("Không tìm thấy dữ liệu ở máy nào")
-        return result, messages
+                statuses.append(
+                    ServerStatus(
+                        server=server,
+                        state="error",
+                        message=f"Máy {server} tắt (lỗi kết nối)",
+                        error=str(exc),
+                    )
+                )
+        return result, statuses
 
     first_hit: Model | None = None
     for server in servers:
@@ -55,11 +100,28 @@ def query_across_servers(
             if obj:
                 if first_hit is None:
                     first_hit = obj
-                messages.append(f"Máy {server} có dữ liệu")
+                statuses.append(
+                    ServerStatus(
+                        server=server,
+                        state="ok",
+                        message=f"Máy {server} có dữ liệu",
+                    )
+                )
             else:
-                messages.append(
-                    f"Máy {server} Nodata (quét hết, chưa mở, quá hạn, lỗi máy chưa có dữ liệu)"
+                statuses.append(
+                    ServerStatus(
+                        server=server,
+                        state="nodata",
+                        message=f"Máy {server} Nodata (quét hết, chưa mở, quá hạn, lỗi máy chưa có dữ liệu)",
+                    )
                 )
         except (OperationalError, DatabaseError) as exc:
-            messages.append(f"Máy {server} tắt (lỗi kết nối: {exc})")
-    return first_hit, messages
+            statuses.append(
+                ServerStatus(
+                    server=server,
+                    state="error",
+                    message=f"Máy {server} tắt (lỗi kết nối)",
+                    error=str(exc),
+                )
+            )
+    return first_hit, statuses

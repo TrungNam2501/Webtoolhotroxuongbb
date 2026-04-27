@@ -24,17 +24,54 @@
             <button type="submit" class="btn btn-primary">Kiểm tra</button>
         </form>
 
-        {% if summary or summary2 %}
+        {% if error_message %}
             <div class="alerts" style="margin-top: 16px;">
-                {% if summary %}
-                    <div class="alert alert-info">{{ summary }}</div>
-                {% endif %}
-                {% if summary2 %}
-                    <div class="alert alert-info">{{ summary2 }}</div>
-                {% endif %}
+                <div class="alert alert-error">{{ error_message }}</div>
             </div>
         {% endif %}
     </div>
+
+    {% if machines %}
+        <div class="card-body machine-grid-wrap">
+            <div class="machine-grid">
+                {% for m in machines %}
+                    <div class="machine-card machine-{{ m.data.state|default:'unknown' }}"
+                         {% if m.data.error %}title="{{ m.data.error }}"{% endif %}>
+                        <div class="machine-card-head">
+                            <span class="machine-name">{{ m.name }}</span>
+                            {% if m.scan.state == 'scanned' %}
+                                <span class="machine-scan-count" title="Số lần quét ở {{ m.name }}">
+                                    {{ m.scan.count }}×
+                                </span>
+                            {% endif %}
+                        </div>
+                        <div class="machine-pill machine-pill-{{ m.data.state|default:'unknown' }}">
+                            {% if m.data.state == 'ok' %}
+                                <span class="dot"></span> Có dữ liệu
+                            {% elif m.data.state == 'nodata' %}
+                                <span class="dot"></span> Không có
+                            {% elif m.data.state == 'error' %}
+                                <span class="dot"></span> Mất kết nối
+                            {% else %}
+                                <span class="dot"></span> —
+                            {% endif %}
+                        </div>
+                        <div class="machine-pill machine-pill-scan-{{ m.scan.state|default:'unknown' }}">
+                            {% if m.scan.state == 'scanned' %}
+                                Đã quét {{ m.scan.count }} lần
+                            {% elif m.scan.state == 'not_scanned' %}
+                                Chưa quét
+                            {% elif m.scan.state == 'error' %}
+                                Mất kết nối
+                            {% else %}
+                                —
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
 </div>
 
 {% if result %}

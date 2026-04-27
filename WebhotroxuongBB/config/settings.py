@@ -171,12 +171,16 @@ _bb_hosts = {
 }
 
 if USE_SQLITE_FALLBACK:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": str(BASE_DIR / "db.sqlite3"),
-        }
+    _sqlite = {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": str(BASE_DIR / "db.sqlite3"),
     }
+    DATABASES = {"default": _sqlite, "33BB": _sqlite}
+    for key in _default_bb_hosts:
+        DATABASES[key] = _sqlite
+        DATABASES[f"{key}_mfnsshare"] = _sqlite
+    DATABASES["KV2KD"] = _sqlite
+    DATABASES["KV1KD"] = _sqlite
 else:
     DATABASES = {
         "default": _mssql(_erp_host, _erp_db, timeout=None),
