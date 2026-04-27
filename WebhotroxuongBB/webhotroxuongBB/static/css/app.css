@@ -1106,3 +1106,146 @@ button {
 .btn-row .btn {
     flex: 1 1 120px;
 }
+
+/* --------------------------------------------------- BB machine grid */
+
+.machine-grid-wrap {
+    padding-top: 0;
+}
+
+.machine-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+}
+
+@media (max-width: 960px) {
+    .machine-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 520px) {
+    .machine-grid { grid-template-columns: 1fr; }
+}
+
+.machine-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px 14px 16px;
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    border: 1px solid var(--surface-border);
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.machine-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    border-radius: var(--radius-md) 0 0 var(--radius-md);
+    background: var(--machine-accent, var(--surface-border));
+}
+
+.machine-card:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.machine-ok       { --machine-accent: #10b981; }
+.machine-nodata   { --machine-accent: #f97316; }
+.machine-error    { --machine-accent: #9ca3af; }
+.machine-unknown  { --machine-accent: var(--surface-border); }
+
+.machine-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.machine-name {
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: 0.02em;
+    color: var(--text);
+}
+
+.machine-scan-count {
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba(99, 102, 241, 0.12);
+    color: var(--primary-600);
+}
+
+.machine-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    width: fit-content;
+    line-height: 1.3;
+}
+
+.machine-pill .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+    flex: 0 0 auto;
+}
+
+.machine-pill-ok {
+    background: rgba(16, 185, 129, 0.12);
+    color: #047857;
+}
+
+.machine-pill-nodata {
+    background: rgba(249, 115, 22, 0.12);
+    color: #c2410c;
+}
+
+.machine-pill-error {
+    background: rgba(156, 163, 175, 0.18);
+    color: #4b5563;
+}
+
+.machine-pill-unknown {
+    background: rgba(148, 163, 184, 0.15);
+    color: var(--text-muted);
+}
+
+.machine-pill-scan-scanned {
+    background: rgba(99, 102, 241, 0.12);
+    color: var(--primary-600);
+}
+
+.machine-pill-scan-not_scanned {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px dashed var(--surface-border);
+}
+
+.machine-pill-scan-error {
+    background: rgba(156, 163, 175, 0.18);
+    color: #4b5563;
+}
+
+@media (prefers-color-scheme: dark) {
+    .machine-pill-ok     { color: #6ee7b7; }
+    .machine-pill-nodata { color: #fdba74; }
+    .machine-pill-error  { color: #cbd5e1; }
+    .machine-pill-scan-scanned { color: #c4b5fd; }
+}
+
+[data-theme="dark"] .machine-pill-ok     { color: #6ee7b7; }
+[data-theme="dark"] .machine-pill-nodata { color: #fdba74; }
+[data-theme="dark"] .machine-pill-error  { color: #cbd5e1; }
+[data-theme="dark"] .machine-pill-scan-scanned { color: #c4b5fd; }

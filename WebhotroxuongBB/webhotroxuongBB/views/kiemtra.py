@@ -28,43 +28,67 @@ from ..services.database import (
 logger = logging.getLogger(__name__)
 
 
+def _merge_machine_status(
+    data_statuses: list,
+    scan_statuses: list,
+) -> list[dict]:
+    """Ghép cặp trạng thái dữ liệu / quét cho từng máy BB1..BB8.
+
+    Tên server có thể là ``BB1`` hoặc ``BB1_mfnsshare``; chuẩn hóa về
+    số thứ tự 1..8 để ghép 2 danh sách. Trả về list ``{name, data, scan}``.
+    """
+
+    def _machine_key(server: str) -> str:
+        return server.split("_", 1)[0]  # "BB1_mfnsshare" -> "BB1"
+
+    by_key = {_machine_key(s.server): s for s in data_statuses}
+    scan_by_key = {_machine_key(s.server): s for s in scan_statuses}
+
+    machines: list[dict] = []
+    for index in range(1, len(BB_SERVERS) + 1):
+        key = f"BB{index}"
+        machines.append(
+            {
+                "name": key,
+                "data": by_key.get(key),
+                "scan": scan_by_key.get(key),
+            }
+        )
+    return machines
+
+
 def kiemtratemquetbb(request: HttpRequest) -> HttpResponse:
     query = request.GET.get("barcode", "").strip()
     result = None
     result2: list = []
-    summary = ""
-    summary2 = ""
+    machines: list[dict] = []
+    error_message = ""
 
     if query:
         try:
             if query.startswith("V"):
-                result, messages = query_across_servers(
+                result, data_statuses = query_across_servers(
                     BB_SERVERS, AutoSmallScanCode, "plan_id", query
                 )
             elif query.startswith("R"):
-                result, messages = query_across_servers(
+                result, data_statuses = query_across_servers(
                     BB_MFNS_SHARE_SERVERS, IFMixPrintLab, "barcode_lab", query
                 )
             else:
-                result, messages = query_across_servers(
+                result, data_statuses = query_across_servers(
                     BB_SERVERS, Mes2RawMaterial, "barcode", query
                 )
 
-            result2, messages2 = query_across_servers(
+            result2, scan_statuses = query_across_servers(
                 BB_SERVERS, PptBarCodeRep, "mater_barcode", query
             )
 
-            summary = ", ".join(messages)
-            summary2 = (
-                f", {messages2}"
-                if isinstance(messages2, str)
-                else f" {', '.join(messages2)}"
-            )
+            machines = _merge_machine_status(data_statuses, scan_statuses)
         except (OperationalError, DatabaseError) as exc:
-            summary = f"Lỗi cơ sở dữ liệu: {exc}"
+            error_message = f"Lỗi cơ sở dữ liệu: {exc}"
             result = []
         except Exception as exc:  # noqa: BLE001
-            summary = f"Lỗi hệ thống không xác định: {exc}"
+            error_message = f"Lỗi hệ thống không xác định: {exc}"
             result = []
 
     return render(
@@ -74,8 +98,8 @@ def kiemtratemquetbb(request: HttpRequest) -> HttpResponse:
             "query": query,
             "result": result,
             "result2": result2,
-            "summary": summary,
-            "summary2": summary2,
+            "machines": machines,
+            "error_message": error_message,
         },
     )
 
