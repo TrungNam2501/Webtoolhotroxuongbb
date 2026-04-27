@@ -1329,17 +1329,26 @@ button {
         align-self: center;
     }
 
-    .data-table.table-stacked td:empty,
-    .data-table.table-stacked td:is(:empty, [data-label=""]) {
+    /* Ô thực sự trống (vd. chỉ có whitespace) thì giấu luôn */
+    .data-table.table-stacked td:empty {
         display: none;
     }
 
+    /* Ô không có label (vd. cột Thao tác) thì trải rộng 1 cột
+       và bỏ phần label trước — nhưng vẫn hiển thị nội dung bên trong */
     .data-table.table-stacked td[data-label=""] {
         grid-template-columns: 1fr;
+        padding-top: 10px;
     }
 
     .data-table.table-stacked td[data-label=""]::before {
         display: none;
+    }
+
+    /* Button trong ô hành động -> full width cho dễ chạm */
+    .data-table.table-stacked td[data-label=""] .btn {
+        width: 100%;
+        justify-content: center;
     }
 }
 
