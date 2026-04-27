@@ -1,16 +1,20 @@
-import pyodbc
-import psycopg2
-import uuid
+"""Chuyển dữ liệu từ SQL Server ``erp.prdebe`` sang PostgreSQL ``kvmes.material_resource``."""
+
+from __future__ import annotations
+
 import json
+import uuid
 from datetime import datetime, time as dtime
+
 import pytz
 from django.conf import settings
 
 
 def get_connection(db_config):
-    """Tạo kết nối đến cơ sở dữ liệu."""
-    if db_config['ENGINE'] == 'mssql':
-        # SQL Server connection using pyodbc
+    """Tạo kết nối đến cơ sở dữ liệu (pyodbc cho MSSQL, psycopg2 cho PG)."""
+    if db_config["ENGINE"] == "mssql":
+        import pyodbc  # lazy import
+
         conn_str = (
             f"DRIVER={{{db_config['OPTIONS']['driver']}}};"
             f"SERVER={db_config['HOST']};"
@@ -20,16 +24,17 @@ def get_connection(db_config):
             f"{db_config['OPTIONS'].get('extra_params', '')}"
         )
         return pyodbc.connect(conn_str)
-    else:
-        # PostgreSQL connection using psycopg2
-        return psycopg2.connect(
-            host=db_config['HOST'],
-            dbname=db_config['NAME'],
-            user=db_config['USER'],
-            password=db_config['PASSWORD'],
-            port=db_config['PORT'],
-            options=db_config.get('OPTIONS', {}).get('options', '')
-        )
+
+    import psycopg2  # lazy import
+
+    return psycopg2.connect(
+        host=db_config["HOST"],
+        dbname=db_config["NAME"],
+        user=db_config["USER"],
+        password=db_config["PASSWORD"],
+        port=db_config["PORT"],
+        options=db_config.get("OPTIONS", {}).get("options", ""),
+    )
 
 
 def run_transfer(where_clause: str) -> int:

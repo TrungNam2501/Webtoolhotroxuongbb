@@ -1,28 +1,34 @@
-import psycopg2
-from psycopg2.extras import Json, RealDictCursor
+"""Đồng bộ KV1 → KV2 cho các bảng thuộc schema ``kvmes``."""
 
-# Định nghĩa SPECIAL_COLS
+from __future__ import annotations
+
 SPECIAL_COLS = {
     "kvmes.material_resource": {"jsonb": ["info"], "array": ["feed_records_id"]},
     "kvmes.collect_record": {"jsonb": ["detail"], "array": []},
     "kvmes.feed_record": {"jsonb": ["materials"], "array": []},
     "kvmes.batch": {"jsonb": ["records"], "array": ["records_id"]},
-    "kvmes.work_order": {"jsonb": ["information"], "array": []}
+    "kvmes.work_order": {"jsonb": ["information"], "array": []},
 }
 
+
 def get_connection(db_config):
-    """Tạo kết nối đến cơ sở dữ liệu."""
+    """Tạo kết nối PostgreSQL (import psycopg2 muộn)."""
+    import psycopg2  # lazy import
+
     return psycopg2.connect(
-        host=db_config['HOST'],
-        dbname=db_config['NAME'],
-        user=db_config['USER'],
-        password=db_config['PASSWORD'],
-        port=db_config['PORT'],
-        options=db_config['OPTIONS']['options']
+        host=db_config["HOST"],
+        dbname=db_config["NAME"],
+        user=db_config["USER"],
+        password=db_config["PASSWORD"],
+        port=db_config["PORT"],
+        options=db_config["OPTIONS"]["options"],
     )
+
 
 def insert_data(conn, table, rows):
     """Chèn dữ liệu vào bảng với xử lý đặc biệt cho jsonb và array."""
+    from psycopg2.extras import Json  # lazy import
+
     if not rows:
         return
 
@@ -52,6 +58,8 @@ def insert_data(conn, table, rows):
 
 def fetch_related_data(conn, material_id):
     """Lấy dữ liệu liên quan từ KV1KD dựa trên material_id."""
+    from psycopg2.extras import RealDictCursor  # lazy import
+
     with conn.cursor(cursor_factory=RealDictCursor) as cur:
         # 1. material_resource
         cur.execute("SELECT * FROM kvmes.material_resource WHERE id = %s", (material_id,))

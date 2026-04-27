@@ -1,10 +1,9 @@
+import os
+
 import openpyxl
-from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
+from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.page import PageMargins
-import os
-import pyodbc
-from django.conf import settings
 
 class GetExcelInlaiBB:
     @staticmethod
@@ -398,8 +397,11 @@ def get_maso(Soluong, pday, partno, mesid, barcode):
     return maso
 
 def get_connection():
-    db_config = settings.DATABASES['default']
-    conn = pyodbc.connect(
+    import pyodbc  # lazy import
+    from django.conf import settings
+
+    db_config = settings.DATABASES["default"]
+    return pyodbc.connect(
         f"DRIVER={db_config['OPTIONS']['driver']};"
         f"SERVER={db_config['HOST']};"
         f"DATABASE={db_config['NAME']};"
@@ -407,6 +409,5 @@ def get_connection():
         f"PWD={db_config['PASSWORD']};"
         f"{db_config['OPTIONS']['extra_params']}"
     )
-    return conn
 
 

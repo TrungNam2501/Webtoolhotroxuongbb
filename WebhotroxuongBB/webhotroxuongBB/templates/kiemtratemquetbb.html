@@ -1,383 +1,162 @@
 {% extends 'base.html' %}
-{% block title %}Kiểm tra tem scan bb{% endblock %}
+{% block title %}Kiểm tra tem scan BB{% endblock %}
+{% block breadcrumb %}Kiểm tem scan BB{% endblock %}
+
 {% block content %}
-<style>
-    /* Reset và font chữ */
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-  
-    /* Container chính */
-    .data-container {
-        max-width: 1200px;
-        margin: 30px auto;
-        background: white;
-        border-radius: 10px;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-    }
-    /* Thanh tìm kiếm và tiêu đề */
-    .table-header {
-        padding: 10px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background: linear-gradient(135deg, #7ce4cd1e, #4d5152ff);
-        color: white;
-        flex-wrap: wrap;
-    }
-    .table-title {
-        font-size: 1.5rem;
-        font-weight: 600;
-        color: black;
-    }
-    .printer-select {
-        margin: 0 15px;
-    }
-    .printer-select select {
-        padding: 10px 15px;
-        border: none;
-        border-radius: 30px;
-        background: rgba(255, 255, 255, 0.2);
-        color: white;
-        outline: none;
-        font-size: 0.9rem;
-        cursor: pointer;
-    }
-    .printer-select select option {
-        background: #333;
-        color: white;
-    }
-    .search-box {
-        position: relative;
-        width: 300px;
-        display: flex;
-        align-items: center;
-    }
-    .search-box input {
-        flex: 1;
-        padding: 10px 15px 10px 40px;
-        border: none;
-        border-radius: 30px;
-        background: rgba(255, 255, 255, 0.2);
-        color: white;
-        outline: none;
-    }
-    .search-box input::placeholder {
-        color: rgba(255, 255, 255, 0.7);
-    }
-    .search-icon {
-        position: absolute;
-        left: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: white;
-    }
-    .search-box button {
-        padding: 10px 15px;
-        border: none;
-        border-radius: 30px;
-        background: #0062ff;
-        color: white;
-        cursor: pointer;
-        font-size: 0.9rem;
-        margin-left: 10px;
-        transition: background 0.3s;
-    }
-    .search-box button:hover {
-        background: #0050d1;
-    }
-    /* Bảng dữ liệu */
-    .data-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-    .data-table thead th {
-        background-color: #f1f1f1;
-        color: #333;
-        font-weight: 600;
-        padding: 15px;
-        text-align: left;
-        border-bottom: 2px solid #ddd;
-    }
-    .data-table tbody tr {
-        border-bottom: 1px solid #eee;
-        transition: all 0.3s ease;
-    }
-    .data-table tbody tr:hover {
-        background-color: #f9f9f9;
-        transform: translateX(5px);
-    }
-    .data-table tbody td {
-        padding: 15px;
-    }
-    /* Status colors */
-    .status {
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: 0.85rem;
-        font-weight: 500;
-    }
-    .status.active {
-        background: #e3f5ef;
-        color: #00b894;
-    }
-    .status.pending {
-        background: #fff4e5;
-        color: #f39c12;
-    }
-    .status.inactive {
-        background: #ffecea;
-        color: #e74c3c;
-    }
-    /* Pagination */
-    .pagination {
-        display: flex;
-        justify-content: center;
-        padding: 20px;
-        list-style: none;
-    }
-    .pagination li {
-        margin: 0 5px;
-    }
-    .pagination a {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        color: #333;
-        text-decoration: none;
-        font-weight: 500;
-        transition: all 0.3s;
-    }
-    .pagination a:hover,
-    .pagination a.active {
-        background: #0062ff;
-        color: white;
-    }
-    /* Responsive */
-    @media (max-width: 768px) {
-        .table-header {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        .printer-select, .search-box {
-            width: 100%;
-            margin-top: 15px;
-        }
-        .printer-select select {
-            width: 100%;
-            border-radius: 30px;
-        }
-        .search-box input {
-            border-radius: 30px;
-        }
-        .search-box button {
-            border-radius: 30px;
-        }
-        .data-table {
-            display: block;
-            overflow-x: auto;
-        }
-    }
-    /* No results message */
-    .no-results {
-        text-align: center;
-        padding: 20px;
-        color: #8fe73cff;
-        font-weight: 500;
-    }
-    .no-results1 {
-        text-align: center;
-        padding: 20px;
-        color: #e74c3c;
-        font-weight: 500;
-    }
-    /* Tiêu đề bảng */
-    .table-caption {
-        font-size: 1.2rem;
-        font-weight: 600;
-        color: #333;
-        padding: 15px;
-        background: #f8f9fa;
-        border-bottom: 1px solid #ddd;
-    }
-    /* No results message */
-</style>
+<div class="page-header">
+    <h1 class="page-title">Kiểm tra tem quét xưởng BB</h1>
+    <p class="page-subtitle">
+        Dựa trên ký tự đầu của barcode, hệ thống sẽ truy vấn bảng phù
+        hợp ở máy BB1 – BB8 và các DB mfnsShareDB.
+    </p>
+</div>
 
-<div class="data-container">
-     <div class="table-header">
-        <div class="table-title">Kiểm tra tem scan bb</div>
-         <div class="search-box">
-            <span class="search-icon">🔍</span>
-            <form method="get" id="search-form">
-                <input type="text" name="barcode" placeholder="Nhập mã vạch ..." value="{{ query }}">
-                <button type="submit">Tìm</button>
-            </form>
-        </div>
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">Tìm kiếm</h2>
     </div>
+    <div class="card-body">
+        <form method="get" id="search-form" class="search-bar">
+            <div class="search-input">
+                <input type="text" name="barcode" value="{{ query }}"
+                       placeholder="Nhập mã vạch (V…, R…, hoặc số)" autofocus>
+            </div>
+            <button type="submit" class="btn btn-primary">Kiểm tra</button>
+        </form>
 
-
-{% if summary %}
-        <p class="no-results1">{{ summary }}</p>
-        <p class="no-results">{{ summary2 }}</p>
-{% endif %}
+        {% if summary or summary2 %}
+            <div class="alerts" style="margin-top: 16px;">
+                {% if summary %}
+                    <div class="alert alert-info">{{ summary }}</div>
+                {% endif %}
+                {% if summary2 %}
+                    <div class="alert alert-info">{{ summary2 }}</div>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
 
 {% if result %}
     {% if query|slice:"0:1" == 'V' %}
-        <!-- Bảng cho trường hợp reason là 'Checked' -->
-        <div class="table-caption">Kết quả cho AutoSmallScanCode (Query bắt đầu bằng 'V')</div>
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th>Plan_Id</th>
-                    <th>Prd_Date</th>
-                    <th>End_Date</th>
-                    <th>Recipe_ID</th>
-                    <th>Equip_Code</th>
-                    <th>Plan_Date</th>
-                    <th>Weight</th>
-                    <th>Active</th>
-                    
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>{{ result.plan_id }}</td>
-                    <td>{{ result.prd_date }}</td>
-                    <td>{{ result.end_date }}</td>
-                    <td>{{ result.recipe_id }}</td>
-                    <td>{{ result.equip_code }}</td>
-                    <td>{{ result.plan_date }}</td>
-                    <td>{{ result.weight }}</td>
-                    <td>{{ result.active }}</td>
-                   
-                </tr>
-            </tbody>
-        </table>
-
+        <div class="card" style="margin-top: 24px;">
+            <div class="table-caption">Kết quả cho AutoSmallScanCode (Query bắt đầu bằng 'V')</div>
+            <div class="table-scroll">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Plan_Id</th><th>Prd_Date</th><th>End_Date</th>
+                            <th>Recipe_ID</th><th>Equip_Code</th><th>Plan_Date</th>
+                            <th>Weight</th><th>Active</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-mono">{{ result.plan_id }}</td>
+                            <td>{{ result.prd_date }}</td>
+                            <td>{{ result.end_date }}</td>
+                            <td>{{ result.recipe_id }}</td>
+                            <td>{{ result.equip_code }}</td>
+                            <td>{{ result.plan_date }}</td>
+                            <td>{{ result.weight }}</td>
+                            <td>{{ result.active }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     {% elif query|slice:"0:1" == 'R' %}
-        <!-- Bảng cho trường hợp reason là 'Pending' -->
-        <div class="table-caption">Kết quả cho IF_MixPrintLab (Query bắt đầu bằng 'R')</div>
-        <table class="data-table pending-table">
-            <thead>
-                <tr>
-                    <th>MixSaveTime</th>
-                    <th>Shift</th>
-                    <th>Equip_ID</th>
-                    <th>Plan_ID</th>
-                    <th>Recipe_Code</th>
-                    <th>Dailylimit</th>
-                    <th>Weight</th>
-                    <th>BarCodeLab</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>{{ result.mix_save_time }}</td>
-                    <td>{{ result.shift }}</td>
-                    <td>{{ result.equip_id }}</td>
-                    <td>{{ result.plan_id }}</td>
-                    <td>{{ result.recipe_code }}</td>
-                    <td>{{ result.daily_limit }}</td>
-                    <td>{{ result.weight }}</td>
-                    <td>{{ result.barcode_lab }}</td>
-                </tr>
-            </tbody>
-        </table>
-
+        <div class="card" style="margin-top: 24px;">
+            <div class="table-caption">Kết quả cho IF_MixPrintLab (Query bắt đầu bằng 'R')</div>
+            <div class="table-scroll">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>MixSaveTime</th><th>Shift</th><th>Equip_ID</th>
+                            <th>Plan_ID</th><th>Recipe_Code</th><th>Dailylimit</th>
+                            <th>Weight</th><th>BarCodeLab</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ result.mix_save_time }}</td>
+                            <td>{{ result.shift }}</td>
+                            <td>{{ result.equip_id }}</td>
+                            <td class="text-mono">{{ result.plan_id }}</td>
+                            <td>{{ result.recipe_code }}</td>
+                            <td>{{ result.daily_limit }}</td>
+                            <td>{{ result.weight }}</td>
+                            <td class="text-mono">{{ result.barcode_lab }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     {% else %}
-        <!-- Bảng mặc định cho các trường hợp khác -->
-        <div class="table-caption">Kết quả cho Mes2RawMaterial (Query bắt đầu bằng số)</div>
-        <table class="data-table default-table">
-            <thead>
-                <tr>
-                    <th>EquipCode</th>
-                    <th>Barcode</th>
-                    <th>PerPackageWeight</th>
-                    <th>LotNumber</th>
-                    <th>ProductDate</th>
-                    <th>ValidDate</th>
-                    <th>ProductName</th>
-                    <th>RecordTime</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>{{ result.equip_code }}</td>
-                    <td>{{ result.barcode }}</td>
-                    <td>{{ result.per_package_weight }}</td>
-                    <td>{{ result.lot_number }}</td>
-                    <td>{{ result.product_date }}</td>
-                    <td>{{ result.valid_date }}</td>
-                    <td>{{ result.product_name }}</td>
-                    <td>{{ result.record_time }}</td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="card" style="margin-top: 24px;">
+            <div class="table-caption">Kết quả cho Mes2RawMaterial (Query bắt đầu bằng số)</div>
+            <div class="table-scroll">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>EquipCode</th><th>Barcode</th><th>PerPackageWeight</th>
+                            <th>LotNumber</th><th>ProductDate</th><th>ValidDate</th>
+                            <th>ProductName</th><th>RecordTime</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ result.equip_code }}</td>
+                            <td class="text-mono">{{ result.barcode }}</td>
+                            <td>{{ result.per_package_weight }}</td>
+                            <td>{{ result.lot_number }}</td>
+                            <td>{{ result.product_date }}</td>
+                            <td>{{ result.valid_date }}</td>
+                            <td>{{ result.product_name }}</td>
+                            <td>{{ result.record_time }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     {% endif %}
 {% endif %}
+
 {% if result2 %}
-    <div class="table-caption">Kết quả cho Ppt_BarCodeRep (Bảng quét tem)</div>
-    <table class="data-table">
-        <thead>
-            <tr>
-                <th>Save Time</th>
-                <th>Barcode</th>
-                <th>Equip ID</th>
-                <th>Plan ID</th>
-                <th>Recipe Code</th>
-                <th>Recipe Name</th>
-                <th>Mater Barcode</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in result2 %}
-                <tr>
-                    <td>{{ item.save_time }}</td>
-                    <td>{{ item.barcode }}</td>
-                    <td>{{ item.equip_id }}</td>
-                    <td>{{ item.plan_id }}</td>
-                    <td>{{ item.recipe_code }}</td>
-                    <td>{{ item.recipe_name }}</td>
-                    <td>{{ item.mater_barcode }}</td>
-                </tr>
-            {% empty %}
-                <tr>
-                    <td colspan="7" class="no-results">Không có dữ liệu</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-{% elif query %}
-    <p class="no-results">Mã barcode sai hoặc chưa mở khóa: <b>{{ query }}</b></p>
+    <div class="card" style="margin-top: 24px;">
+        <div class="table-caption">Kết quả cho Ppt_BarCodeRep (Bảng quét tem)</div>
+        <div class="table-scroll">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Save Time</th><th>Barcode</th><th>Equip ID</th>
+                        <th>Plan ID</th><th>Recipe Code</th><th>Recipe Name</th>
+                        <th>Mater Barcode</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in result2 %}
+                        <tr>
+                            <td>{{ item.save_time }}</td>
+                            <td class="text-mono">{{ item.barcode }}</td>
+                            <td>{{ item.equip_id }}</td>
+                            <td class="text-mono">{{ item.plan_id }}</td>
+                            <td>{{ item.recipe_code }}</td>
+                            <td>{{ item.recipe_name }}</td>
+                            <td class="text-mono">{{ item.mater_barcode }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="7" class="empty-state">Không có dữ liệu</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% elif query and not result %}
+    <div class="card" style="margin-top: 24px;">
+        <div class="empty-state">
+            Mã barcode sai hoặc chưa mở khóa: <strong>{{ query }}</strong>
+        </div>
+    </div>
 {% endif %}
-
-</div>
-
-
-<script>
-    const searchInput = document.querySelector('.search-box input');
-    const searchForm = document.querySelector('#search-form');
-
-    // Allow form submission with Enter key
-    searchInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            searchForm.submit();
-        }
-    });
-
-    // Trigger form submission on button click
-    const searchButton = document.querySelector('.search-box button');
-    searchButton.addEventListener('click', function() {
-        searchForm.submit();
-    });
-
-</script>
 {% endblock %}

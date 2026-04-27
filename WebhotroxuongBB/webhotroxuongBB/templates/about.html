@@ -1,82 +1,54 @@
 {% extends 'base.html' %}
 {% block title %}Giới thiệu Phòng Vi Tính{% endblock %}
+{% block breadcrumb %}Giới thiệu{% endblock %}
+
 {% block content %}
-<style>
-    .about-container {
-        max-width: 900px;
-        margin: 30px auto;
-        padding: 20px;
-        background: #fff;
-        border-radius: 10px;
-        box-shadow: 0 0 15px rgba(0,0,0,0.1);
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        color: #333;
-        line-height: 1.6;
-    }
-    .about-container h1 {
-        font-size: 2rem;
-        margin-bottom: 20px;
-        color: #0062ff;
-        text-align: center;
-    }
-    .about-container h2 {
-        font-size: 1.3rem;
-        margin-top: 25px;
-        margin-bottom: 10px;
-        color: #004bb5;
-        border-bottom: 2px solid #0062ff;
-        padding-bottom: 5px;
-    }
-    .about-container p, .about-container ul {
-        margin-bottom: 15px;
-    }
-    .about-container ul {
-        padding-left: 20px;
-    }
-    .about-container li {
-        margin-bottom: 8px;
-    }
-    @media (max-width: 600px) {
-        .about-container {
-            padding: 15px;
-            margin: 15px;
-        }
-        .about-container h1 {
-            font-size: 1.5rem;
-        }
-        .about-container h2 {
-            font-size: 1.1rem;
-        }
-    }
-</style>
+<div class="page-header">
+    <h1 class="page-title">Phòng Vi Tính – Kenda Việt Nam</h1>
+    <p class="page-subtitle">
+        Đội ngũ công nghệ đứng sau các hệ thống ERP, MES và các công cụ hỗ
+        trợ sản xuất hằng ngày của xưởng BB.
+    </p>
+</div>
 
-<div class="about-container">
-    <h1>Giới thiệu Phòng Vi Tính – Công ty Cao Su Kenda Việt Nam</h1>
+<div class="card">
+    <div class="card-body">
+        <p>
+            Phòng Vi Tính (IT) của Công ty Cao su Kenda Việt Nam là bộ phận
+            chuyên trách về công nghệ, đóng vai trò quan trọng trong việc
+            hỗ trợ và duy trì hoạt động sản xuất – kinh doanh của toàn
+            công ty.
+        </p>
+    </div>
 
-    <p>Phòng Vi Tính (hay Phòng Công Nghệ Thông Tin – IT) của Công ty Cao Su Kenda Việt Nam là bộ phận chuyên trách về công nghệ, đóng vai trò quan trọng trong việc hỗ trợ và duy trì hoạt động sản xuất – kinh doanh của toàn công ty.</p>
+    <div class="card-body">
+        <h3 class="card-title">Chức năng chính</h3>
+        <ul>
+            <li><strong>Quản trị hệ thống:</strong> Quản lý mạng nội bộ, server, hệ thống email, cơ sở dữ liệu và phần mềm dùng chung.</li>
+            <li><strong>Hỗ trợ kỹ thuật:</strong> Đảm bảo máy tính, thiết bị văn phòng, phần mềm ERP/MES vận hành ổn định, kịp thời xử lý sự cố.</li>
+            <li><strong>An toàn thông tin:</strong> Bảo mật dữ liệu, sao lưu dự phòng, cập nhật phần mềm chống virus và ngăn chặn rủi ro an ninh mạng.</li>
+            <li><strong>Phát triển ứng dụng:</strong> Xây dựng và cải tiến các phần mềm quản lý sản xuất, kho, nhân sự nhằm nâng cao hiệu quả vận hành.</li>
+            <li><strong>Tư vấn công nghệ:</strong> Đề xuất, triển khai giải pháp CNTT hiện đại để hỗ trợ các phòng ban trong quá trình chuyển đổi số.</li>
+        </ul>
+    </div>
 
-    <h2>Chức năng chính</h2>
-    <ul>
-        <li><strong>Quản trị hệ thống:</strong> Quản lý mạng nội bộ, server, hệ thống email, cơ sở dữ liệu và phần mềm dùng chung.</li>
-        <li><strong>Hỗ trợ kỹ thuật:</strong> Đảm bảo các máy tính, thiết bị văn phòng, phần mềm ERP/MES vận hành ổn định, kịp thời xử lý sự cố.</li>
-        <li><strong>An toàn thông tin:</strong> Bảo mật dữ liệu, sao lưu dự phòng, cập nhật phần mềm chống virus và ngăn chặn rủi ro an ninh mạng.</li>
-        <li><strong>Phát triển ứng dụng:</strong> Xây dựng và cải tiến các phần mềm quản lý sản xuất, kho, nhân sự nhằm nâng cao hiệu quả vận hành.</li>
-        <li><strong>Tư vấn công nghệ:</strong> Đề xuất, triển khai giải pháp CNTT hiện đại để hỗ trợ các phòng ban trong quá trình chuyển đổi số.</li>
-    </ul>
+    <div class="card-body">
+        <h3 class="card-title">Vai trò trong công ty</h3>
+        <ul>
+            <li>Cầu nối giữa công nghệ và sản xuất với đội ngũ kỹ sư, nhân viên IT chuyên môn cao.</li>
+            <li>Dây chuyền sản xuất vận hành liên tục (MES, ERP kết nối trực tiếp với hệ thống sản xuất săm, lốp).</li>
+            <li>Thông tin chính xác, kịp thời phục vụ quản lý và điều hành từ lãnh đạo đến các phân xưởng.</li>
+            <li>Hiệu quả công việc cao hơn, giảm thời gian thủ công, tăng tự động hóa và kiểm soát chất lượng.</li>
+        </ul>
+    </div>
 
-    <h2>Vai trò trong công ty</h2>
-    <ul>
-        <li>Phòng Vi Tính là cầu nối giữa công nghệ và sản xuất, với đội ngũ kỹ sư, nhân viên IT chuyên môn cao.</li>
-        <li>Dây chuyền sản xuất vận hành liên tục (MES, ERP kết nối trực tiếp với hệ thống sản xuất săm, lốp).</li>
-        <li>Thông tin chính xác, kịp thời phục vụ quản lý, điều hành từ cấp lãnh đạo đến các phân xưởng.</li>
-        <li>Hiệu quả công việc cao hơn, giảm thời gian xử lý thủ công, tăng tính tự động hóa và kiểm soát chất lượng.</li>
-    </ul>
-
-    <h2>Định hướng phát triển</h2>
-    <ul>
-        <li>Ứng dụng chuyển đổi số sâu rộng trong quản lý & sản xuất.</li>
-        <li>Triển khai IoT và Big Data để giám sát sản xuất thời gian thực.</li>
-        <li>Hỗ trợ công ty mở rộng quy mô, đáp ứng nhu cầu xuất khẩu ngày càng lớn.</li>
-    </ul>
+    <div class="card-body">
+        <h3 class="card-title">Định hướng phát triển</h3>
+        <ul>
+            <li>Ứng dụng chuyển đổi số sâu rộng trong quản lý &amp; sản xuất.</li>
+            <li>Triển khai IoT và Big Data để giám sát sản xuất thời gian thực.</li>
+            <li>Hỗ trợ công ty mở rộng quy mô, đáp ứng nhu cầu xuất khẩu ngày càng lớn.</li>
+        </ul>
+    </div>
 </div>
 {% endblock %}
