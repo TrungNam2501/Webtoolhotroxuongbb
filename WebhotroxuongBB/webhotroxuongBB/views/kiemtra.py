@@ -96,6 +96,11 @@ def kiemtratemquetbb(request: HttpRequest) -> HttpResponse:
             machines = _merge_machine_status(data_statuses, scan_statuses)
 
             if query.startswith("R") and result2:
+                if not data_server:
+                    for s in scan_statuses:
+                        if s.state == "scanned":
+                            data_server = s.server.split("_", 1)[0]
+                            break
                 machines_with_data = {
                     s.server.split("_", 1)[0]
                     for s in data_statuses
@@ -107,7 +112,7 @@ def kiemtratemquetbb(request: HttpRequest) -> HttpResponse:
                 all_scanned = all(
                     scan_by_key.get(m) and scan_by_key[m].state == "scanned"
                     for m in machines_with_data
-                ) if machines_with_data else False
+                )
         except (OperationalError, DatabaseError) as exc:
             error_message = f"Lỗi cơ sở dữ liệu: {exc}"
             result = []
