@@ -17,6 +17,7 @@
     </div>
     <div class="card-body">
         <form method="get" id="search-form" class="search-bar" data-submit-loading>
+            {% csrf_token %}
             <div class="search-input">
                 <input type="text" name="barcode" value="{{ query }}"
                        placeholder="Nhập mã vạch (V…, R…, hoặc số)" autofocus>
@@ -178,6 +179,9 @@
                         <th>Save Time</th><th>Barcode</th><th>Equip ID</th>
                         <th>Plan ID</th><th>Recipe Code</th><th>Recipe Name</th>
                         <th>Mater Barcode</th>
+                        {% if query|slice:"0:1" == 'R' %}
+                            <th class="text-right">Thao tác</th>
+                        {% endif %}
                     </tr>
                 </thead>
                 <tbody>
@@ -190,9 +194,18 @@
                             <td data-label="Recipe Code">{{ item.recipe_code }}</td>
                             <td data-label="Recipe Name">{{ item.recipe_name }}</td>
                             <td class="text-mono" data-label="Mater Barcode">{{ item.mater_barcode }}</td>
+                            {% if query|slice:"0:1" == 'R' %}
+                                <td data-label="">
+                                    <button class="btn btn-sm btn-success btn-mothem"
+                                            data-barcode-lab="{{ query }}"
+                                            data-server="BB{{ item.equip_id }}">
+                                        Mở thêm 1 lần
+                                    </button>
+                                </td>
+                            {% endif %}
                         </tr>
                     {% empty %}
-                        <tr><td colspan="7" class="empty-state">Không có dữ liệu</td></tr>
+                        <tr><td colspan="{% if query|slice:'0:1' == 'R' %}8{% else %}7{% endif %}" class="empty-state">Không có dữ liệu</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -241,6 +254,56 @@
                 card.classList.toggle('is-hidden', !show);
             });
         });
+    });
+
+    function csrfToken() {
+        const el = document.querySelector('[name=csrfmiddlewaretoken]');
+        return el ? el.value : '';
+    }
+
+    async function moThemMotLan(btn) {
+        const barcodeLab = btn.dataset.barcodeLab;
+        const server = btn.dataset.server;
+        if (!barcodeLab || !server) return;
+
+        if (!confirm('Xác nhận mở thêm 1 lần cho ' + barcodeLab + ' trên ' + server + '?')) return;
+
+        const original = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Đang xử lý…';
+        showLoading(true);
+
+        try {
+            const res = await fetch('/mothemtemquetbb/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken(),
+                },
+                body: JSON.stringify({ barcode_lab: barcodeLab, server: server }),
+            });
+            const json = await res.json();
+            if (res.ok) {
+                toast('success', 'Thành công', json.message);
+                btn.textContent = 'Đã mở';
+                btn.classList.remove('btn-success');
+                btn.classList.add('btn-ghost');
+            } else {
+                toast('error', 'Lỗi', json.message || 'Không thể mở thêm.');
+                btn.disabled = false;
+                btn.textContent = original;
+            }
+        } catch (err) {
+            toast('error', 'Lỗi mạng', err.message);
+            btn.disabled = false;
+            btn.textContent = original;
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    document.querySelectorAll('.btn-mothem').forEach((btn) => {
+        btn.addEventListener('click', () => moThemMotLan(btn));
     });
 })();
 </script>

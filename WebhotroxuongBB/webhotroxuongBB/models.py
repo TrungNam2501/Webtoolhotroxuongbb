@@ -125,6 +125,32 @@ class IFMixPrintLab(models.Model):
         db_table = 'IF_MixPrintLab'
         managed = False
 
+class IFMixPrintLabNew(models.Model):
+    id = models.AutoField(primary_key=True, db_column='ID')
+    mix_save_time = models.CharField(max_length=20, null=True, db_column='MixSaveTime')
+    shift = models.CharField(max_length=8, null=True, db_column='Shift')
+    barcode = models.CharField(max_length=20, null=True, db_column='Barcode')
+    equip_id = models.IntegerField(null=True, db_column='Equip_ID')
+    plan_id = models.CharField(max_length=20, null=True, db_column='Plan_ID')
+    recipe_code = models.CharField(max_length=50, null=True, db_column='Recipe_Code')
+    recipe_name = models.CharField(max_length=50, null=True, db_column='Recipe_Name')
+    recipe_type = models.IntegerField(null=True, db_column='Recipe_Type')
+    set_num = models.IntegerField(null=True, db_column='Set_Num')
+    serial_num = models.IntegerField(null=True, db_column='Serial_Num')
+    shift_num = models.IntegerField(null=True, db_column='ShiftNum')
+    daily_limit = models.IntegerField(null=True, db_column='Dailylimit')
+    weight = models.DecimalField(max_digits=8, decimal_places=3, db_column='Weight')
+    barcode_lab = models.CharField(max_length=50, null=True, db_column='BarCodeLab')
+    write_time = models.CharField(max_length=20, null=True, db_column='Write_Time')
+    read_time = models.CharField(max_length=20, null=True, db_column='Read_Time')
+    rw_flag = models.CharField(max_length=1, null=True, db_column='RW_Flag')
+    active = models.BooleanField(null=True, db_column='Active')
+
+    class Meta:
+        db_table = 'IF_MixPrintLab_new'
+        managed = False
+
+
 class PptBarCodeRep(models.Model):
     pkid = models.CharField(primary_key=True, max_length=40)
     barcode = models.CharField(max_length=20, db_column='Barcode')

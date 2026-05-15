@@ -12,6 +12,7 @@ from .kiemtra import (
     kiemtragiahan_update,
     kiemtramokhoabb,
     kiemtratemquetbb,
+    mothemtemquetbb,
 )
 from .tem_oem import temoembb
 from .tieu_chuan import kiemtratieuchuantheomay, kiemtratieuchuantheomay_weigh
@@ -29,6 +30,7 @@ __all__ = [
     "insert_databaetembb",
     "kiemtragiahan",
     "kiemtragiahan_update",
+    "mothemtemquetbb",
     "temoembb",
     "kv1tokv2",
     "tembbcusangkd",
