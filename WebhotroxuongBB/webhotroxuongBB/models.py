@@ -100,6 +100,21 @@ class AutoSmallScanCode(models.Model):
         managed = False   # vì bạn không muốn Django tự sửa bảng
         db_table = 'AutoSmall_ScanCode'
 
+class AutoSmallScanCodeNew(models.Model):
+    plan_id = models.CharField(db_column='Plan_Id', max_length=20, primary_key=True)
+    prd_date = models.CharField(db_column='Prd_Date', max_length=8)
+    end_date = models.CharField(db_column='End_Date', max_length=8)
+    recipe_id = models.CharField(db_column='Recipe_ID', max_length=30)
+    equip_code = models.CharField(db_column='Equip_Code', max_length=30, null=True, blank=True)
+    plan_date = models.CharField(db_column='Plan_Date', max_length=30, null=True, blank=True)
+    weight = models.DecimalField(db_column='Weight', max_digits=8, decimal_places=2, null=True, blank=True)
+    active = models.BooleanField(db_column='Active', null=True, blank=True)
+
+    class Meta:
+        managed = False
+        db_table = 'AutoSmall_ScanCode_new'
+
+
 class IFMixPrintLab(models.Model):
     id = models.AutoField(primary_key=True, db_column='ID')
     mix_save_time = models.CharField(max_length=20, null=True, db_column='MixSaveTime')
