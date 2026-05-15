@@ -4,10 +4,12 @@ from __future__ import annotations
 
 import json
 import logging
+from datetime import datetime
 
 from django.db import DatabaseError, OperationalError
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import render
+from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
 from ..models import (
@@ -192,3 +194,42 @@ def kiemtragiahan(request: HttpRequest) -> HttpResponse:
             "error_message": error_message,
         },
     )
+
+
+@csrf_exempt
+def kiemtragiahan_update(request: HttpRequest) -> JsonResponse:
+    if request.method != "POST":
+        return JsonResponse({"message": "Yêu cầu không hợp lệ!"}, status=400)
+
+    try:
+        data = json.loads(request.body or b"{}")
+    except json.JSONDecodeError:
+        return JsonResponse({"message": "JSON không hợp lệ"}, status=400)
+
+    record_id = data.get("id")
+    if not record_id:
+        return JsonResponse({"message": "Thiếu ID bản ghi."}, status=400)
+
+    try:
+        now = timezone.localtime(timezone.now())
+        new_indat = now.strftime("%Y%m%d")
+        new_intime = now.strftime("%H:%M:%S")
+
+        updated = (
+            Prdbad.objects.using("default")
+            .filter(id=record_id)
+            .update(indat=new_indat, intime=new_intime)
+        )
+
+        if updated == 0:
+            return JsonResponse({"message": "Không tìm thấy bản ghi."}, status=404)
+
+        return JsonResponse({
+            "message": "Gia hạn lại thành công!",
+            "indat": new_indat,
+            "intime": new_intime,
+        })
+    except (OperationalError, DatabaseError) as exc:
+        return JsonResponse({"message": f"Lỗi cơ sở dữ liệu: {exc}"}, status=500)
+    except Exception as exc:  # noqa: BLE001
+        return JsonResponse({"message": f"Lỗi hệ thống: {exc}"}, status=500)

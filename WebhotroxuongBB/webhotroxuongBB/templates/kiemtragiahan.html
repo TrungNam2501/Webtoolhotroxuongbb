@@ -20,6 +20,7 @@
     </div>
     <div class="card-body">
         <form method="get" id="search-form" class="search-bar" data-submit-loading>
+            {% csrf_token %}
             <div class="search-input">
                 <input type="text" name="barcode" value="{{ query }}"
                        placeholder="Nhập barcode (bắt đầu bằng R)…" autofocus>
@@ -49,11 +50,12 @@
                         <th>usrno</th>
                         <th>dutydept</th>
                         <th>dutydeptna</th>
+                        <th class="text-right">Thao tác</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for row in results %}
-                        <tr>
+                        <tr data-id="{{ row.id }}">
                             <td data-label="subno">{{ row.subno }}</td>
                             <td class="text-mono" data-label="slipno">{{ row.slipno }}</td>
                             <td data-label="stacode">{{ row.stacode }}</td>
@@ -61,11 +63,17 @@
                             <td data-label="mark">
                                 <span class="status-pill status-active">{{ row.mark }}</span>
                             </td>
-                            <td data-label="indat">{{ row.indat }}</td>
-                            <td data-label="intime">{{ row.intime }}</td>
+                            <td data-label="indat" class="cell-indat">{{ row.indat }}</td>
+                            <td data-label="intime" class="cell-intime">{{ row.intime }}</td>
                             <td data-label="usrno">{{ row.usrno }}</td>
                             <td data-label="dutydept">{{ row.dutydept }}</td>
                             <td data-label="dutydeptna">{{ row.dutydeptna }}</td>
+                            <td data-label="">
+                                <button class="btn btn-sm btn-success btn-renew"
+                                        data-id="{{ row.id }}">
+                                    Gia hạn lại
+                                </button>
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -90,6 +98,62 @@
         if (e.key === 'Enter') searchForm?.submit();
     });
     searchForm?.addEventListener('submit', () => showLoading(true));
+
+    function csrfToken() {
+        const el = document.querySelector('[name=csrfmiddlewaretoken]');
+        return el ? el.value : '';
+    }
+
+    async function renewRecord(btn) {
+        const recordId = btn.dataset.id;
+        if (!recordId) return;
+
+        if (!confirm('Xác nhận gia hạn lại bản ghi ID ' + recordId + '?')) return;
+
+        const original = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Đang xử lý…';
+        showLoading(true);
+
+        try {
+            const res = await fetch('/kiemtragiahan/update/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken(),
+                },
+                body: JSON.stringify({ id: recordId }),
+            });
+            const json = await res.json();
+            if (res.ok) {
+                toast('success', 'Thành công', json.message);
+                const row = btn.closest('tr');
+                if (row) {
+                    const indatCell = row.querySelector('.cell-indat');
+                    const intimeCell = row.querySelector('.cell-intime');
+                    if (indatCell) indatCell.textContent = json.indat;
+                    if (intimeCell) intimeCell.textContent = json.intime;
+                }
+                btn.textContent = 'Đã gia hạn';
+                btn.classList.remove('btn-success');
+                btn.classList.add('btn-ghost');
+            } else {
+                toast('error', 'Lỗi', json.message || 'Không thể gia hạn.');
+                btn.disabled = false;
+                btn.textContent = original;
+            }
+        } catch (err) {
+            toast('error', 'Lỗi mạng', err.message);
+            btn.disabled = false;
+            btn.textContent = original;
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    document.querySelectorAll('.btn-renew').forEach((btn) => {
+        btn.addEventListener('click', () => renewRecord(btn));
+    });
 })();
 </script>
 {% endblock %}
