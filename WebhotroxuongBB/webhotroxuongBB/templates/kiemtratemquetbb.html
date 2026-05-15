@@ -85,7 +85,7 @@
 </div>
 
 {% if result %}
-    {% if query|slice:"0:1" == 'V' %}
+    {% if first_char == 'V' %}
         <div class="card" style="margin-top: 24px;">
             <div class="table-caption">Kết quả cho AutoSmallScanCode (Query bắt đầu bằng 'V')</div>
             <div class="table-scroll">
@@ -112,7 +112,7 @@
                 </table>
             </div>
         </div>
-    {% elif query|slice:"0:1" == 'R' %}
+    {% elif first_char == 'R' %}
         <div class="card" style="margin-top: 24px;">
             <div class="table-caption">Kết quả cho IF_MixPrintLab (Query bắt đầu bằng 'R')</div>
             <div class="table-scroll">

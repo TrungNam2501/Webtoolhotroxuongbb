@@ -71,12 +71,13 @@ def kiemtratemquetbb(request: HttpRequest) -> HttpResponse:
     data_server = ""
 
     if query:
+        first_char = query[0:1].upper()
         try:
-            if query.startswith("V"):
+            if first_char == "V":
                 result, data_statuses = query_across_servers(
                     BB_SERVERS, AutoSmallScanCode, "plan_id", query
                 )
-            elif query.startswith("R"):
+            elif first_char == "R":
                 result, data_statuses = query_across_servers(
                     BB_MFNS_SHARE_SERVERS, IFMixPrintLab, "barcode_lab", query
                 )
@@ -95,7 +96,7 @@ def kiemtratemquetbb(request: HttpRequest) -> HttpResponse:
 
             machines = _merge_machine_status(data_statuses, scan_statuses)
 
-            if query.startswith("R") and result2:
+            if first_char == "R" and result2:
                 if not data_server:
                     for s in scan_statuses:
                         if s.state == "scanned":
@@ -125,6 +126,7 @@ def kiemtratemquetbb(request: HttpRequest) -> HttpResponse:
         "kiemtratemquetbb.html",
         {
             "query": query,
+            "first_char": query[0:1].upper() if query else "",
             "result": result,
             "result2": result2,
             "machines": machines,
