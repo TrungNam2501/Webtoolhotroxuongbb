@@ -9,6 +9,7 @@ from .inlaitem import generate_excel, inlaitem
 from .kiemtra import (
     insert_databaetembb,
     kiemtragiahan,
+    kiemtragiahan_update,
     kiemtramokhoabb,
     kiemtratemquetbb,
 )
@@ -27,6 +28,7 @@ __all__ = [
     "kiemtramokhoabb",
     "insert_databaetembb",
     "kiemtragiahan",
+    "kiemtragiahan_update",
     "temoembb",
     "kv1tokv2",
     "tembbcusangkd",
