@@ -24,5 +24,6 @@ urlpatterns = [
     ),
     path("temoembb/", views.temoembb, name="temoembb"),
     path("kiemtragiahan", views.kiemtragiahan, name="kiemtragiahan"),
+    path("mothemtemquetbb/", views.mothemtemquetbb, name="mothemtemquetbb"),
     path("kiemtragiahan/update/", views.kiemtragiahan_update, name="kiemtragiahan_update"),
 ]

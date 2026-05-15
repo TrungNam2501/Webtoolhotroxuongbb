@@ -15,6 +15,7 @@ from django.views.decorators.csrf import csrf_exempt
 from ..models import (
     AutoSmallScanCode,
     IFMixPrintLab,
+    IFMixPrintLabNew,
     Mes2RawMaterial,
     Prdbad,
     PptBarCodeRep,
@@ -149,6 +150,71 @@ def insert_databaetembb(request: HttpRequest) -> JsonResponse:
         usrno=data.get("usrno", ""),
     ).save()
     return JsonResponse({"message": "Dữ liệu đã được chèn thành công!"}, status=201)
+
+
+@csrf_exempt
+def mothemtemquetbb(request: HttpRequest) -> JsonResponse:
+    if request.method != "POST":
+        return JsonResponse({"message": "Yêu cầu không hợp lệ!"}, status=400)
+
+    try:
+        data = json.loads(request.body or b"{}")
+    except json.JSONDecodeError:
+        return JsonResponse({"message": "JSON không hợp lệ"}, status=400)
+
+    barcode_lab = data.get("barcode_lab", "").strip()
+    server = data.get("server", "").strip()
+
+    if not barcode_lab or not server:
+        return JsonResponse({"message": "Thiếu barcode_lab hoặc server."}, status=400)
+
+    if not barcode_lab.startswith("R"):
+        return JsonResponse({"message": "Chỉ hỗ trợ tem bắt đầu bằng R."}, status=400)
+
+    db_alias = f"{server}_mfnsshare"
+    valid_aliases = BB_MFNS_SHARE_SERVERS
+    if db_alias not in valid_aliases:
+        return JsonResponse({"message": f"Server {server} không hợp lệ."}, status=400)
+
+    try:
+        source = IFMixPrintLabNew.objects.using(db_alias).filter(
+            barcode_lab=barcode_lab
+        ).first()
+
+        if not source:
+            return JsonResponse(
+                {"message": f"Không tìm thấy barcode {barcode_lab} trong IF_MixPrintLab_new trên {server}."},
+                status=404,
+            )
+
+        IFMixPrintLab.objects.using(db_alias).create(
+            mix_save_time=source.mix_save_time,
+            shift=source.shift,
+            barcode=source.barcode,
+            equip_id=source.equip_id,
+            plan_id=source.plan_id,
+            recipe_code=source.recipe_code,
+            recipe_name=source.recipe_name,
+            recipe_type=source.recipe_type,
+            set_num=source.set_num,
+            serial_num=source.serial_num,
+            shift_num=source.shift_num,
+            daily_limit=source.daily_limit,
+            weight=source.weight,
+            barcode_lab=source.barcode_lab,
+            write_time=source.write_time,
+            read_time=source.read_time,
+            rw_flag=source.rw_flag,
+            active=source.active,
+        )
+
+        return JsonResponse({
+            "message": f"Đã mở thêm 1 lần cho {barcode_lab} trên {server} thành công!",
+        })
+    except (OperationalError, DatabaseError) as exc:
+        return JsonResponse({"message": f"Lỗi cơ sở dữ liệu: {exc}"}, status=500)
+    except Exception as exc:  # noqa: BLE001
+        return JsonResponse({"message": f"Lỗi hệ thống: {exc}"}, status=500)
 
 
 def kiemtragiahan(request: HttpRequest) -> HttpResponse:
