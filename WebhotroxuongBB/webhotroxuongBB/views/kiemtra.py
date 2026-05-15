@@ -14,6 +14,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from ..models import (
     AutoSmallScanCode,
+    AutoSmallScanCodeNew,
     IFMixPrintLab,
     IFMixPrintLabNew,
     Mes2RawMaterial,
@@ -91,7 +92,7 @@ def kiemtratemquetbb(request: HttpRequest) -> HttpResponse:
 
             machines = _merge_machine_status(data_statuses, scan_statuses)
 
-            if first_char == "R" and result2:
+            if first_char in ("R", "V") and result2:
                 equip_id = getattr(result2[0], "equip_id", None)
                 if equip_id is not None:
                     data_server = f"BB{equip_id}"
@@ -177,12 +178,19 @@ def mothemtemquetbb(request: HttpRequest) -> JsonResponse:
     if not barcode_lab or not server:
         return JsonResponse({"message": "Thiếu barcode_lab hoặc server."}, status=400)
 
-    if not barcode_lab.startswith("R"):
-        return JsonResponse({"message": "Chỉ hỗ trợ tem bắt đầu bằng R."}, status=400)
+    first_char = barcode_lab[0:1].upper()
 
+    if first_char == "R":
+        return _mothem_r(barcode_lab, server)
+    if first_char == "V":
+        return _mothem_v(barcode_lab, server)
+
+    return JsonResponse({"message": "Chỉ hỗ trợ tem bắt đầu bằng R hoặc V."}, status=400)
+
+
+def _mothem_r(barcode_lab: str, server: str) -> JsonResponse:
     db_alias = f"{server}_mfnsshare"
-    valid_aliases = BB_MFNS_SHARE_SERVERS
-    if db_alias not in valid_aliases:
+    if db_alias not in BB_MFNS_SHARE_SERVERS:
         return JsonResponse({"message": f"Server {server} không hợp lệ."}, status=400)
 
     try:
@@ -219,6 +227,42 @@ def mothemtemquetbb(request: HttpRequest) -> JsonResponse:
 
         return JsonResponse({
             "message": f"Đã mở thêm 1 lần cho {barcode_lab} trên {server} thành công!",
+        })
+    except (OperationalError, DatabaseError) as exc:
+        return JsonResponse({"message": f"Lỗi cơ sở dữ liệu: {exc}"}, status=500)
+    except Exception as exc:  # noqa: BLE001
+        return JsonResponse({"message": f"Lỗi hệ thống: {exc}"}, status=500)
+
+
+def _mothem_v(plan_id: str, server: str) -> JsonResponse:
+    db_alias = server
+    if db_alias not in BB_SERVERS:
+        return JsonResponse({"message": f"Server {server} không hợp lệ."}, status=400)
+
+    try:
+        source = AutoSmallScanCodeNew.objects.using(db_alias).filter(
+            plan_id=plan_id
+        ).first()
+
+        if not source:
+            return JsonResponse(
+                {"message": f"Không tìm thấy {plan_id} trong AutoSmall_ScanCode_new trên {server}."},
+                status=404,
+            )
+
+        AutoSmallScanCode.objects.using(db_alias).create(
+            plan_id=source.plan_id,
+            prd_date=source.prd_date,
+            end_date=source.end_date,
+            recipe_id=source.recipe_id,
+            equip_code=source.equip_code,
+            plan_date=source.plan_date,
+            weight=source.weight,
+            active=source.active,
+        )
+
+        return JsonResponse({
+            "message": f"Đã mở thêm 1 lần cho {plan_id} trên {server} thành công!",
         })
     except (OperationalError, DatabaseError) as exc:
         return JsonResponse({"message": f"Lỗi cơ sở dữ liệu: {exc}"}, status=500)
