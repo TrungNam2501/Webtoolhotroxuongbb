@@ -171,7 +171,16 @@
 
 {% if result2 %}
     <div class="card" style="margin-top: 24px;">
-        <div class="table-caption">Kết quả cho Ppt_BarCodeRep (Bảng quét tem)</div>
+        <div class="table-caption" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+            <span>Kết quả cho Ppt_BarCodeRep (Bảng quét tem)</span>
+            {% if all_scanned and data_server %}
+                <button class="btn btn-sm btn-success btn-mothem"
+                        data-barcode-lab="{{ query }}"
+                        data-server="{{ data_server }}">
+                    Mở thêm 1 lần
+                </button>
+            {% endif %}
+        </div>
         <div class="table-scroll">
             <table class="data-table table-stacked">
                 <thead>
@@ -179,9 +188,6 @@
                         <th>Save Time</th><th>Barcode</th><th>Equip ID</th>
                         <th>Plan ID</th><th>Recipe Code</th><th>Recipe Name</th>
                         <th>Mater Barcode</th>
-                        {% if query|slice:"0:1" == 'R' %}
-                            <th class="text-right">Thao tác</th>
-                        {% endif %}
                     </tr>
                 </thead>
                 <tbody>
@@ -194,18 +200,9 @@
                             <td data-label="Recipe Code">{{ item.recipe_code }}</td>
                             <td data-label="Recipe Name">{{ item.recipe_name }}</td>
                             <td class="text-mono" data-label="Mater Barcode">{{ item.mater_barcode }}</td>
-                            {% if query|slice:"0:1" == 'R' %}
-                                <td data-label="">
-                                    <button class="btn btn-sm btn-success btn-mothem"
-                                            data-barcode-lab="{{ query }}"
-                                            data-server="BB{{ item.equip_id }}">
-                                        Mở thêm 1 lần
-                                    </button>
-                                </td>
-                            {% endif %}
                         </tr>
                     {% empty %}
-                        <tr><td colspan="{% if query|slice:'0:1' == 'R' %}8{% else %}7{% endif %}" class="empty-state">Không có dữ liệu</td></tr>
+                        <tr><td colspan="7" class="empty-state">Không có dữ liệu</td></tr>
                     {% endfor %}
                 </tbody>
             </table>

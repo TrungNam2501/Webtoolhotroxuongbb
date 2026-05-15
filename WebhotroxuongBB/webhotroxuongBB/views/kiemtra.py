@@ -67,6 +67,8 @@ def kiemtratemquetbb(request: HttpRequest) -> HttpResponse:
     result2: list = []
     machines: list[dict] = []
     error_message = ""
+    all_scanned = False
+    data_server = ""
 
     if query:
         try:
@@ -78,6 +80,10 @@ def kiemtratemquetbb(request: HttpRequest) -> HttpResponse:
                 result, data_statuses = query_across_servers(
                     BB_MFNS_SHARE_SERVERS, IFMixPrintLab, "barcode_lab", query
                 )
+                for s in data_statuses:
+                    if s.state == "ok":
+                        data_server = s.server.split("_", 1)[0]
+                        break
             else:
                 result, data_statuses = query_across_servers(
                     BB_SERVERS, Mes2RawMaterial, "barcode", query
@@ -88,6 +94,20 @@ def kiemtratemquetbb(request: HttpRequest) -> HttpResponse:
             )
 
             machines = _merge_machine_status(data_statuses, scan_statuses)
+
+            if query.startswith("R") and result2:
+                machines_with_data = {
+                    s.server.split("_", 1)[0]
+                    for s in data_statuses
+                    if s.state == "ok"
+                }
+                scan_by_key = {
+                    s.server.split("_", 1)[0]: s for s in scan_statuses
+                }
+                all_scanned = all(
+                    scan_by_key.get(m) and scan_by_key[m].state == "scanned"
+                    for m in machines_with_data
+                ) if machines_with_data else False
         except (OperationalError, DatabaseError) as exc:
             error_message = f"Lỗi cơ sở dữ liệu: {exc}"
             result = []
@@ -104,6 +124,8 @@ def kiemtratemquetbb(request: HttpRequest) -> HttpResponse:
             "result2": result2,
             "machines": machines,
             "error_message": error_message,
+            "all_scanned": all_scanned,
+            "data_server": data_server,
         },
     )
 
