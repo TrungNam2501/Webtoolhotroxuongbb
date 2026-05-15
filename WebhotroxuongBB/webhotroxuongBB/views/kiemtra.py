@@ -80,10 +80,6 @@ def kiemtratemquetbb(request: HttpRequest) -> HttpResponse:
                 result, data_statuses = query_across_servers(
                     BB_MFNS_SHARE_SERVERS, IFMixPrintLab, "barcode_lab", query
                 )
-                for s in data_statuses:
-                    if s.state == "ok":
-                        data_server = s.server.split("_", 1)[0]
-                        break
             else:
                 result, data_statuses = query_across_servers(
                     BB_SERVERS, Mes2RawMaterial, "barcode", query
@@ -95,11 +91,10 @@ def kiemtratemquetbb(request: HttpRequest) -> HttpResponse:
 
             machines = _merge_machine_status(data_statuses, scan_statuses)
 
-            if first_char == "R" and result2 and not data_server:
-                for s in scan_statuses:
-                    if s.state == "scanned":
-                        data_server = s.server.split("_", 1)[0]
-                        break
+            if first_char == "R" and result2:
+                equip_id = getattr(result2[0], "equip_id", None)
+                if equip_id is not None:
+                    data_server = f"BB{equip_id}"
         except (OperationalError, DatabaseError) as exc:
             error_message = f"Lỗi cơ sở dữ liệu: {exc}"
             result = []
