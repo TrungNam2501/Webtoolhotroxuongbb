@@ -23,4 +23,5 @@ urlpatterns = [
         name="kiemtratieuchuantheomay_weigh",
     ),
     path("temoembb/", views.temoembb, name="temoembb"),
+    path("kiemtragiahan", views.kiemtragiahan, name="kiemtragiahan"),
 ]

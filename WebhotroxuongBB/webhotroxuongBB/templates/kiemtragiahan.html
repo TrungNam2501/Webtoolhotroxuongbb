@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block title %}Kiểm tra gia hạn{% endblock %}
+{% block breadcrumb %}Kiểm tra gia hạn{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Kiểm tra tem gia hạn</h1>
+    <p class="page-subtitle">
+        Tra cứu bảng <code>prdbad</code> theo barcode (bắt đầu bằng R)
+        để kiểm tra tem đã được gia hạn hay chưa.
+    </p>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">Tìm kiếm</h2>
+        {% if searched %}
+            <span class="badge">Tổng: {{ total_results }}</span>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        <form method="get" id="search-form" class="search-bar" data-submit-loading>
+            <div class="search-input">
+                <input type="text" name="barcode" value="{{ query }}"
+                       placeholder="Nhập barcode (bắt đầu bằng R)…" autofocus>
+            </div>
+            <button type="submit" class="btn btn-primary">Kiểm tra</button>
+        </form>
+
+        {% if error_message %}
+            <div class="alerts" style="margin-top: 16px;">
+                <div class="alert alert-error">{{ error_message }}</div>
+            </div>
+        {% endif %}
+    </div>
+
+    {% if results %}
+        <div class="table-scroll">
+            <table class="data-table table-stacked">
+                <thead>
+                    <tr>
+                        <th>subno</th>
+                        <th>slipno</th>
+                        <th>stacode</th>
+                        <th>stacodena</th>
+                        <th>mark</th>
+                        <th>indat</th>
+                        <th>intime</th>
+                        <th>usrno</th>
+                        <th>dutydept</th>
+                        <th>dutydeptna</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in results %}
+                        <tr>
+                            <td data-label="subno">{{ row.subno }}</td>
+                            <td class="text-mono" data-label="slipno">{{ row.slipno }}</td>
+                            <td data-label="stacode">{{ row.stacode }}</td>
+                            <td data-label="stacodena">{{ row.stacodena }}</td>
+                            <td data-label="mark">
+                                <span class="status-pill status-active">{{ row.mark }}</span>
+                            </td>
+                            <td data-label="indat">{{ row.indat }}</td>
+                            <td data-label="intime">{{ row.intime }}</td>
+                            <td data-label="usrno">{{ row.usrno }}</td>
+                            <td data-label="dutydept">{{ row.dutydept }}</td>
+                            <td data-label="dutydeptna">{{ row.dutydeptna }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% elif searched and not error_message %}
+        <div class="empty-state">
+            Tem <strong>{{ query }}</strong> chưa gia hạn.
+        </div>
+    {% elif not searched %}
+        <div class="empty-state">Nhập barcode bắt đầu bằng R để kiểm tra.</div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function () {
+    const searchInput = document.querySelector('.search-input input');
+    const searchForm = document.getElementById('search-form');
+    searchInput?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') searchForm?.submit();
+    });
+    searchForm?.addEventListener('submit', () => showLoading(true));
+})();
+</script>
+{% endblock %}

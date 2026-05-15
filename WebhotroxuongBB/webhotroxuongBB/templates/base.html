@@ -51,6 +51,10 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>
                     Kiểm mở khóa
                 </a>
+                <a class="nav-link {% if request.path == '/kiemtragiahan' %}active{% endif %}" href="/kiemtragiahan">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>
+                    Kiểm tra gia hạn
+                </a>
                 <a class="nav-link {% if request.path == '/temoembb/' or request.path == '/temoembb' %}active{% endif %}" href="/temoembb/">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4l-8.2 8.2a2 2 0 01-2.8 0L2 13.8V4h9.8l8.8 8.8a2 2 0 010 0.6z"/><circle cx="7" cy="9" r="1.5"/></svg>
                     Tem OEM

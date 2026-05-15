@@ -28,6 +28,13 @@ TOOLS = [
         "accent": "amber",
     },
     {
+        "title": "Kiểm tra gia hạn",
+        "description": "Kiểm tra tem đã gia hạn chưa theo barcode (bảng prdbad).",
+        "url": "/kiemtragiahan",
+        "icon": "clock",
+        "accent": "rose",
+    },
+    {
         "title": "Tem OEM BB",
         "description": "Insert/Delete TemOEMBB, update/unupdate IF_RtPlan2CWSS.",
         "url": "/temoembb",

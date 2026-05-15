@@ -189,3 +189,21 @@ class RtPlan2CWSS(models.Model):
 
     def __str__(self):
         return self.plan_id
+
+
+class Prdbad(models.Model):
+    subno = models.CharField(max_length=1)
+    slipno = models.CharField(max_length=16, null=True, blank=True)
+    stacode = models.CharField(max_length=1, null=True, blank=True)
+    stacodena = models.CharField(max_length=50, null=True, blank=True)
+    mark = models.CharField(max_length=1, null=True, blank=True)
+    indat = models.CharField(max_length=8, null=True, blank=True)
+    intime = models.CharField(max_length=8, null=True, blank=True)
+    usrno = models.CharField(max_length=8, null=True, blank=True)
+    dutydept = models.CharField(max_length=1, null=True, blank=True)
+    dutydeptna = models.CharField(max_length=20, null=True, blank=True)
+    id = models.AutoField(primary_key=True, db_column='ID')
+
+    class Meta:
+        db_table = 'prdbad'
+        managed = False
