@@ -67,7 +67,6 @@ def kiemtratemquetbb(request: HttpRequest) -> HttpResponse:
     result2: list = []
     machines: list[dict] = []
     error_message = ""
-    all_scanned = False
     data_server = ""
 
     if query:
@@ -96,24 +95,11 @@ def kiemtratemquetbb(request: HttpRequest) -> HttpResponse:
 
             machines = _merge_machine_status(data_statuses, scan_statuses)
 
-            if first_char == "R" and result2:
-                if not data_server:
-                    for s in scan_statuses:
-                        if s.state == "scanned":
-                            data_server = s.server.split("_", 1)[0]
-                            break
-                machines_with_data = {
-                    s.server.split("_", 1)[0]
-                    for s in data_statuses
-                    if s.state == "ok"
-                }
-                scan_by_key = {
-                    s.server.split("_", 1)[0]: s for s in scan_statuses
-                }
-                all_scanned = all(
-                    scan_by_key.get(m) and scan_by_key[m].state == "scanned"
-                    for m in machines_with_data
-                )
+            if first_char == "R" and result2 and not data_server:
+                for s in scan_statuses:
+                    if s.state == "scanned":
+                        data_server = s.server.split("_", 1)[0]
+                        break
         except (OperationalError, DatabaseError) as exc:
             error_message = f"Lỗi cơ sở dữ liệu: {exc}"
             result = []
@@ -131,7 +117,6 @@ def kiemtratemquetbb(request: HttpRequest) -> HttpResponse:
             "result2": result2,
             "machines": machines,
             "error_message": error_message,
-            "all_scanned": all_scanned,
             "data_server": data_server,
         },
     )
