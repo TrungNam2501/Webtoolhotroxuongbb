@@ -1,4 +1,4 @@
-"""Các trang kiểm tra tem: scan BB, mở khóa BB, insert lại prdbae_temBB."""
+"""Các trang kiểm tra tem: scan BB, mở khóa BB, gia hạn, insert lại prdbae_temBB."""
 
 from __future__ import annotations
 
@@ -14,6 +14,7 @@ from ..models import (
     AutoSmallScanCode,
     IFMixPrintLab,
     Mes2RawMaterial,
+    Prdbad,
     PptBarCodeRep,
     Prdbae,
     PrdbaeTemBB,
@@ -146,3 +147,48 @@ def insert_databaetembb(request: HttpRequest) -> JsonResponse:
         usrno=data.get("usrno", ""),
     ).save()
     return JsonResponse({"message": "Dữ liệu đã được chèn thành công!"}, status=201)
+
+
+def kiemtragiahan(request: HttpRequest) -> HttpResponse:
+    query = request.GET.get("barcode", "").strip()
+    results = []
+    error_message = ""
+    searched = False
+
+    if query:
+        searched = True
+        if not query.startswith("R"):
+            error_message = "Barcode phải bắt đầu bằng ký tự 'R'."
+        else:
+            try:
+                results = list(
+                    Prdbad.objects.using("default")
+                    .filter(slipno__startswith=query, mark="Y")
+                    .exclude(slipno__startswith="RD")
+                    .order_by("-id")
+                )
+                for row in results:
+                    if row.slipno:
+                        row.slipno = row.slipno.strip()
+                    if row.stacodena:
+                        row.stacodena = row.stacodena.strip()
+                    if row.dutydeptna:
+                        row.dutydeptna = row.dutydeptna.strip()
+                    if row.usrno:
+                        row.usrno = row.usrno.strip()
+            except (OperationalError, DatabaseError) as exc:
+                error_message = f"Lỗi cơ sở dữ liệu: {exc}"
+            except Exception as exc:  # noqa: BLE001
+                error_message = f"Lỗi hệ thống: {exc}"
+
+    return render(
+        request,
+        "kiemtragiahan.html",
+        {
+            "query": query,
+            "results": results,
+            "total_results": len(results),
+            "searched": searched,
+            "error_message": error_message,
+        },
+    )

@@ -8,6 +8,7 @@ from .home import about, home
 from .inlaitem import generate_excel, inlaitem
 from .kiemtra import (
     insert_databaetembb,
+    kiemtragiahan,
     kiemtramokhoabb,
     kiemtratemquetbb,
 )
@@ -25,6 +26,7 @@ __all__ = [
     "kiemtratemquetbb",
     "kiemtramokhoabb",
     "insert_databaetembb",
+    "kiemtragiahan",
     "temoembb",
     "kv1tokv2",
     "tembbcusangkd",
